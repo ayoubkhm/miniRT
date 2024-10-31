@@ -3,11 +3,11 @@
 #ifndef OBJECTS_H
 #define OBJECTS_H
 
-typedef struct s_vector {
+typedef struct s_vec {
     double x;
     double y;
     double z;
-} t_vector;
+} t_vec;
 
 typedef struct s_color {
     int r;
@@ -16,20 +16,20 @@ typedef struct s_color {
 } t_color;
 
 typedef struct s_sphere {
-    t_vector center;
+    t_vec center;
     double radius;
     t_color color;
 } t_sphere;
 
 typedef struct s_plane {
-    t_vector point;
-    t_vector normal;
+    t_vec point;
+    t_vec normal;
     t_color color;
 } t_plane;
 
 typedef struct s_cylinder {
-    t_vector base;
-    t_vector axis;
+    t_vec base;
+    t_vec axis;
     double radius;
     double height;
     t_color color;

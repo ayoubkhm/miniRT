@@ -1,13 +1,16 @@
 // main.c
 
 #include "includes/minirt.h"
+#include "scene/scene.h"
+#include "camera/camera.h"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     t_scene scene;
-    t_camera camera;
+    //t_camera camera;
 
     if (argc != 2) {
-        fprintf(stderr, "Usage: ./minirt scene_file.rt\n");
+        ft_error();
         return (EXIT_FAILURE);
     }
 
@@ -16,22 +19,22 @@ int main(int argc, char **argv) {
 
     // Charger la scène à partir du fichier
     if (!load_scene(&scene, argv[1])) {
-        fprintf(stderr, "Error loading scene\n");
+        ft_error();
         return (EXIT_FAILURE);
     }
 
     // Initialiser la caméra (géré par Mervan)
-    init_camera(&camera, &scene);
+    //init_camera(&camera, &scene);
 
     // Lancer le rendu (géré par Mervan)
-    render_scene(&scene, &camera);
+    //render_scene(&scene, &camera);
 
     // Boucle d'événements pour afficher l'image (géré par Mervan)
-    mlx_loop(camera.mlx_ptr);
+    //mlx_loop(camera.mlx_ptr);
 
     // Libérer la mémoire
     free_scene(&scene);
-    free_camera(&camera);
+    //free_camera(&camera);
 
     return (EXIT_SUCCESS);
 }

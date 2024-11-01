@@ -1,13 +1,11 @@
 // objects.h
 
+#include "../includes/minirt.h"
+#include "scene.h" 
+
+
 #ifndef OBJECTS_H
 #define OBJECTS_H
-
-typedef struct s_vec {
-    double x;
-    double y;
-    double z;
-} t_vec;
 
 typedef struct s_color {
     int r;
@@ -32,6 +30,7 @@ typedef struct s_cylinder {
     t_vec axis;
     double radius;
     double height;
+    double diameter;
     t_color color;
 } t_cylinder;
 

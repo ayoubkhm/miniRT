@@ -1,8 +1,7 @@
-// main.c
-
 #include "includes/minirt.h"
 #include "scene/scene.h"
 #include "camera/camera.h"
+#include "scene/objects.h"
 
 int main(int argc, char **argv)
 {
@@ -22,6 +21,15 @@ int main(int argc, char **argv)
         ft_error();
         return (EXIT_FAILURE);
     }
+
+    printf("Scene loaded successfully:\n");
+    printf("Camera position: %.1f, %.1f, %.1f\n", scene.camera.position.x, scene.camera.position.y, scene.camera.position.z);
+    printf("Ambient light ratio: %.1f\n", scene.ambient_light.ratio);
+
+    printf("Scene loaded successfully:\n");
+    print_scene(&scene);
+    draw_scene(&scene);
+
 
     // Initialiser la caméra (géré par Mervan)
     //init_camera(&camera, &scene);

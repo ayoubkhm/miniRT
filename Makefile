@@ -29,7 +29,15 @@ endif
 # Fichiers sources
 SRC = $(SRCDIR)/main.c \
       $(SCENEDIR)/scene.c \
-      $(SCENEDIR)/objects.c
+      $(SCENEDIR)/add_light.c \
+	  $(SCENEDIR)/free_scene.c \
+	  $(SCENEDIR)/parse_cylinder.c \
+	  $(SCENEDIR)/parse_hyperboloid.c \
+	  $(SCENEDIR)/parse_objects.c \
+	  $(SCENEDIR)/parse_scene.c \
+	  $(SCENEDIR)/utils_list.c \
+	  $(SCENEDIR)/utils_parse.c \
+	  $(SRCDIR)/testing.c \
       # Ajoutez $(CAMERADIR)/camera.c ici lorsque vous aurez le fichier camera.c
 
 # Fichiers objets

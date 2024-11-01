@@ -1,32 +1,19 @@
-// scene.h
-
 #ifndef SCENE_H
 # define SCENE_H
 
-# include "../includes/minirt.h"
-# include "../lib/libft/libft.h"
+# include "../includes/types.h"
+# include "lib/libft/libft.h"
 # include "objects.h"
+# include <math.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-// Liste chaînée générique
 typedef struct s_list {
-    void          *content;
+    void *content;
     struct s_list *next;
 } t_list;
 
-// Types d'objets
-typedef enum e_obj_type {
-    SPHERE,
-    PLANE,
-    CYLINDER
-} t_obj_type;
-
-// Objet générique
-typedef struct s_object {
-    t_obj_type type;
-    void       *data;
-} t_object;
-
-// Lumière ambiante
 typedef struct s_am_light {
     t_color color;
     double  ratio; // Intensité (entre 0.0 et 1.0)
@@ -56,7 +43,7 @@ typedef struct s_scene {
     int         ambient_light_defined;
 } t_scene;
 
-// Prototypes des fonctions
+//scene.c
 void init_scene(t_scene *scene);
 int  load_scene(t_scene *scene, const char *filename);
 
@@ -69,21 +56,27 @@ int parse_sphere(t_scene *scene, char **tokens);
 int parse_plane(t_scene *scene, char **tokens);
 int parse_cylinder(t_scene *scene, char **tokens);
 
+
+t_hyperboloid *create_hyperboloid(t_vec center, t_vec axis, double a, double b, double c, double height, t_color color);
+int parse_hyperboloid(t_scene *scene, char **tokens);
+void free_hyperboloid(t_hyperboloid *hyperboloid);
+
 // Fonctions utilitaires
 t_vec   parse_vector(char *str);
 t_color parse_color(char *str);
 void    free_tokens(char **tokens);
+t_list  *ft_lstnew(void *content);
+void    ft_lstadd_front(t_list **lst, t_list *new_node);
 
+// Fonctions d'ajout d'objets et de lumières
 void add_light(t_scene *scene, t_light *light);
 void add_sphere(t_scene *scene, t_sphere *sphere);
 void add_plane(t_scene *scene, t_plane *plane);
 void add_cylinder(t_scene *scene, t_cylinder *cylinder);
 
-
+// Fonctions de libération de la mémoire
 void free_scene(t_scene *scene);
 void free_objects(t_list *objects);
 void free_lights(t_list *lights);
-void free_tokens(char **tokens);
-
 
 #endif

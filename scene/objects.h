@@ -2,7 +2,7 @@
 # define OBJECTS_H
 
 # include "../includes/types.h" // Inclure types.h pour t_vec et t_color
-# include "lib/libft/libft.h"
+# include "../lib/libft/libft.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -50,7 +50,7 @@ typedef enum e_object_type {
 
 typedef struct s_object {
     t_object_type type;
-    void *data; // Pointeur vers t_sphere, t_plane ou t_cylinder
+    void *data; // Pointeur vers t_sphere, t_plane , t_hyperboloid ou t_cylinder
     t_color color;
 } t_object;
 

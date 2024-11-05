@@ -3,12 +3,14 @@ NAME = minirt
 
 # Compilateur et flags
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -Iincludes -Iscene -Icamera -Ilib/libft -Ilib/mlx
+# CFLAGS = 	-Wall -Wextra -Werror -Iincludes -Iscene -Icamera -Ilib/libft -Ilib/mlx
+CFLAGS =	-Wall -Wextra -Werror -g -I /usr/X11/include -Iincludes -Iscene -Icamera -Ilib/libft #Pour que cela fonctionne chez Mervan
 
 # Dossiers des sources
 SRCDIR = .
 SCENEDIR = scene
 CAMERADIR = camera
+MATHSDIR = maths
 
 # Dossiers des bibliothèques
 LIBFT_DIR = lib/libft
@@ -23,11 +25,12 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     MLX_FLAGS = -L$(MLX_DIR) -lmlx42 -lXext -lX11 -lm -lbsd
 else ifeq ($(UNAME_S),Darwin)
-    MLX_FLAGS = -L$(MLX_DIR) -lmlx42 -framework OpenGL -framework AppKit
+#     MLX_FLAGS = -L$(MLX_DIR) -lmlx42 -framework OpenGL -framework AppKit
+      MLX_FLAGS = -L /usr/X11/lib -l mlx -framework OpenGL -framework AppKit
 endif
 
 # Fichiers sources
-SRC = $(SRCDIR)/main.c \
+SRC = $(SRCDIR)/main2.c \
       $(SCENEDIR)/scene.c \
       $(SCENEDIR)/add_light.c \
 	  $(SCENEDIR)/free_scene.c \
@@ -38,6 +41,8 @@ SRC = $(SRCDIR)/main.c \
 	  $(SCENEDIR)/utils_list.c \
 	  $(SCENEDIR)/utils_parse.c \
 	  $(SRCDIR)/testing.c \
+	  $(MATHSDIR)/vector_op.c \
+	  $(MATHSDIR)/intersection.c
       # Ajoutez $(CAMERADIR)/camera.c ici lorsque vous aurez le fichier camera.c
 
 # Fichiers objets
@@ -50,7 +55,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@$(MAKE) -C $(LIBFT_DIR)       # Compile libft si nécessaire
 	@$(MAKE) -C $(MLX_DIR)         # Compile mlx si nécessaire
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT_FLAGS) $(MLX_FLAGS)
+	@$(CC) $(CFLAGS) $(MLX_FLAGS) -o $(NAME) $(OBJ) $(LIBFT_FLAGS)
 	@echo "Compilation de $(NAME) terminée."
 
 # Compilation des objets

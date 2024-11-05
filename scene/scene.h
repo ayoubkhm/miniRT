@@ -2,7 +2,7 @@
 # define SCENE_H
 
 # include "../includes/types.h"
-# include "lib/libft/libft.h"
+# include "../lib/libft/libft.h"
 # include "objects.h"
 # include <math.h>
 # include <stdio.h>

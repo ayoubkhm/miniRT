@@ -2,14 +2,15 @@
 # define MINIRT_H
 
 # include "types.h"                    // Inclure types.h en premier
-# include "lib/mlx/include/MLX42/MLX42.h"
-# include "lib/libft/libft.h"
+// # include "../lib/mlx/include/MLX42/MLX42.h"
+// # include <mlx.h>
+# include "../lib/libft/libft.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include "objects.h"
-# include "scene/scene.h"
+# include "../scene/objects.h"
+# include "../scene/scene.h"
 
 // Définitions de la grille
 # define GRID_WIDTH 80

@@ -1,4 +1,5 @@
 #include "scene.h"
+#include <mlx.h>
 
 
 void init_scene(t_scene *scene)
@@ -8,7 +9,7 @@ void init_scene(t_scene *scene)
     scene->lights = NULL;
     scene->objects = NULL;
     scene->mlx = mlx_init();
-    scene->win = mlx_new_window(scene->mlx, 600, 800, "Cylindre et plan");
+    scene->win = mlx_new_window(scene->mlx, 800, 600, "Cylindre et plan");
 }
 
 

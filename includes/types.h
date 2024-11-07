@@ -1,12 +1,14 @@
 #ifndef TYPES_H
 # define TYPES_H
+# include "../lib/libft/libft.h"
+
 
 // Définition du vecteur
-typedef struct s_vec {
-    double x;
-    double y;
-    double z;
-} t_vec;
+// typedef struct s_vec {
+//     double x;
+//     double y;
+//     double z;
+// } t_vec;
 
 // Définition de la couleur
 typedef struct s_color {

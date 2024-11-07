@@ -18,6 +18,8 @@ typedef struct s_plane {
     t_vec point;
     t_vec normal;
     t_color color;
+    t_color quadrillage;
+    bool flag_qud;
 } t_plane;
 
 typedef struct s_cylinder {
@@ -52,7 +54,7 @@ typedef struct s_object {
     t_object_type type;
     void *data; // Pointeur vers t_sphere, t_plane , t_hyperboloid ou t_cylinder
     t_color color;
-} t_object;
+}   t_object;
 
 #endif
 

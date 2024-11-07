@@ -7,6 +7,8 @@ void init_scene(t_scene *scene)
     scene->ambient_light_defined = 0;
     scene->lights = NULL;
     scene->objects = NULL;
+    scene->mlx = mlx_init();
+    scene->win = mlx_new_window(scene->mlx, 600, 800, "Cylindre et plan");
 }
 
 

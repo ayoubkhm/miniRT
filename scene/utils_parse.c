@@ -13,6 +13,7 @@ t_vec parse_vector(char *str)
     vec.x = ft_atof(components[0]);
     vec.y = ft_atof(components[1]);
     vec.z = ft_atof(components[2]);
+    // printf("%.1f %.1f %.1f", vec.x, vec.y, vec.z);
 
     free_tokens(components);
     return vec;

@@ -41,6 +41,8 @@ typedef struct s_scene {
     t_list     *objects;               // Liste des objets (t_object *)
     int         camera_defined;
     int         ambient_light_defined;
+    void    *mlx;
+    void    *win;
 } t_scene;
 
 //scene.c

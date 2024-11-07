@@ -22,6 +22,14 @@
 # include <limits.h>
 # include <stdbool.h>
 
+
+
+typedef struct s_vec {
+        double x;
+        double y;
+        double z;
+}       t_vec ;
+
 int		ft_atoi(const char *str);
 long	ft_atol(char *str);
 double  ft_atof(const char *str);
@@ -72,5 +80,8 @@ int		prt_ptr(void *ptr_addr);
 int		prt_int(int n);
 int		prt_unsigned(unsigned int nbr);
 int		prt_hexa(unsigned int nbr, bool upper_case);
+int	        prt_vec(t_vec vec);
+
+
 
 #endif

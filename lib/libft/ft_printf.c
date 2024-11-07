@@ -31,6 +31,8 @@ static int	check_type(char pourcent_type, va_list args)
 		return (prt_unsigned(va_arg(args, unsigned int)));
 	else if (pourcent_type == 'x' || pourcent_type == 'X')
 		return (prt_hexa(va_arg(args, ssize_t), (pourcent_type == 'X')));
+	else if (pourcent_type == 'v')
+		return (prt_vec(va_arg(args, t_vec)));
 	return (0);
 }
 

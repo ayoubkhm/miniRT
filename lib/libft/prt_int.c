@@ -51,3 +51,8 @@ int	prt_int(int n)
 	put_int(n);
 	return (len);
 }
+
+int	prt_vec(t_vec vec)
+{
+	return (printf("{x = %.1f, y = %.1f, z = %.1f}", vec.x, vec.y, vec.z));
+}

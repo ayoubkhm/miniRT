@@ -48,6 +48,25 @@ t_vec compute_ray(int i, int j, t_cam camera)
     return ray_direction;
 }
 
+// Taille des carreaux du damier
+#define CHECKER_SIZE 0.5
+
+t_color apply_checkerboard(t_vec point, t_color color1, t_color color2)
+{
+    int x_check = (int)(floor(point.x / CHECKER_SIZE)) % 2;
+    int y_check = (int)(floor(point.y / CHECKER_SIZE)) % 2;
+    int z_check = (int)(floor(point.z / CHECKER_SIZE)) % 2;
+    
+    if ((x_check + y_check + z_check) % 2 == 0)
+    {
+        return color1;
+    }
+    else
+    {
+        return color2;
+    }
+}
+
 void render_scene(t_scene *scene)
 {
     int i = 0;
@@ -61,13 +80,14 @@ void render_scene(t_scene *scene)
         fprintf(stderr, "Error: mlx or window not initialized.\n");
         return;
     }
+
     while (j < HEIGHT)
     {
         i = 0;
         while (i < WIDTH)
         {
             t_vec ray_dir = compute_ray(i, j, scene->camera);
-            t_color color = {255, 255, 255};
+            t_color color = {255, 255, 255}; // Blanc par défaut
             double t_min = INFINITY;
 
             t_list *current = scene->objects;
@@ -105,7 +125,7 @@ void render_scene(t_scene *scene)
                     }
                 }
 
-                // Si une intersection est trouvée et qu'elle est plus proche, appliquer la texture
+                // Si une intersection est trouvée et qu'elle est plus proche, appliquer la texture ou le damier
                 if (hit && t < t_min && t > 0)
                 {
                     t_min = t;
@@ -120,8 +140,21 @@ void render_scene(t_scene *scene)
                         color.g = (texture_color >> 8) & 0xFF;
                         color.b = texture_color & 0xFF;
                     }
-                    else
+                    else if (object->flag_checkerboard) { // Appliquer le damier si pas de texture
+                        t_vec hit_point = vector_add(scene->camera.position, scale_vec(ray_dir, t));
+                        int checker_x = (int)(floor(hit_point.x / CHECKER_SIZE)) % 2;
+                        int checker_y = (int)(floor(hit_point.y / CHECKER_SIZE)) % 2;
+                        int checker_z = (int)(floor(hit_point.z / CHECKER_SIZE)) % 2;
+                        
+                        // Alterne la couleur pour créer un motif de damier
+                        if ((checker_x + checker_y + checker_z) % 2 == 0)
+                            color = object->color;  // Couleur de base
+                        else
+                            color = (t_color){0, 0, 0};  // Couleur noire pour les carreaux alternatifs
+                    }
+                    else { // Pas de texture ni de damier, applique la couleur de base
                         color = object->color;
+                    }
                 }
                 current = current->next;
             }
@@ -139,6 +172,7 @@ void render_scene(t_scene *scene)
 
     printf("Render completed.\n");
 }
+
 
 
 

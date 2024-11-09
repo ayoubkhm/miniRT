@@ -1,10 +1,10 @@
-#include "scene.h"
-
+#include "../includes/minirt.h"
 
 int parse_line(t_scene *scene, char *line)
 {
-    char **tokens = ft_split(line, ' ');
+    char **tokens;
 
+    tokens = ft_split(line, ' ');
     if (!tokens[0])
     {
         free_tokens(tokens);
@@ -73,7 +73,6 @@ int parse_line(t_scene *scene, char *line)
         free_tokens(tokens);
         return (0);
     }
-
     free_tokens(tokens);
     return (1);
 }
@@ -91,7 +90,6 @@ int parse_ambient_light(t_scene *scene, char **tokens)
         fprintf(stderr, "Error: Invalid ambient light definition\n");
         return (0);
     }
-
     scene->ambient_light.ratio = ft_atof(tokens[1]);
     scene->ambient_light.color = parse_color(tokens[2]);
 
@@ -167,7 +165,9 @@ int parse_light(t_scene *scene, char **tokens)
 
 void free_tokens(char **tokens)
 {
-    int i = 0;
+    int i;
+
+    i = 0;
     while (tokens[i])
     {
         free(tokens[i]);

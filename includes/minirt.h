@@ -1,28 +1,29 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
-# include "types.h"                    // Inclure types.h en premier
-// # include "../lib/mlx/include/MLX42/MLX42.h"
-// # include <mlx.h>
+# include "types.h"
+# include <mlx.h>
 # include "../lib/libft/libft.h"
 # include <math.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
 # include "../scene/objects.h"
 # include "../scene/scene.h"
+#include "../maths/mini_maths.h"
+#define MOVE_SPEED 2.0
+#define ROTATE_SPEED 0.5
 
-// Définitions de la grille
-# define GRID_WIDTH 80
-# define GRID_HEIGHT 24
+t_vec rotate_vec(t_vec vec, t_vec axis, double angle);
+t_vec compute_ray(int i, int j, t_cam camera);
+t_color apply_checkerboard(t_vec point, t_color color1, t_color color2);
+void render_scene(t_scene *scene);
 
-// Prototypes des fonctions de la grille et des projections
-void init_grid_with_border(char grid[GRID_HEIGHT + 2][GRID_WIDTH + 3]);
-void display_grid(char grid[GRID_HEIGHT + 2][GRID_WIDTH + 3]);
-void project_sphere(t_scene *scene, t_sphere *sphere, char grid[GRID_HEIGHT + 2][GRID_WIDTH + 3], double depth_buffer[GRID_HEIGHT][GRID_WIDTH]);
-void project_cylinder(t_scene *scene, t_cylinder *cylinder, char grid[GRID_HEIGHT + 2][GRID_WIDTH + 3], double depth_buffer[GRID_HEIGHT][GRID_WIDTH]);
-void project_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid, char grid[GRID_HEIGHT + 2][GRID_WIDTH + 3], double depth_buffer[GRID_HEIGHT][GRID_WIDTH]);
-void draw_scene(t_scene *scene);
-void print_scene(t_scene *scene);
+void close_window(t_scene *scene);
+int key_press(int keycode, t_scene *scene);
+int key_release(int keycode, t_scene *scene);
+void update_camera_position(t_scene *scene);
 
 #endif

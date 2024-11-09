@@ -1,11 +1,11 @@
-#include "scene.h"
-#include <mlx.h>
-#include <string.h>
-#include <fcntl.h>
+#include "../includes/minirt.h"
 
 int parse_sphere(t_scene *scene, char **tokens)
 {
-    t_sphere *sphere;
+    t_sphere    *sphere;
+    char *texture_path;
+
+    texture_path = NULL;
 
     if (!tokens[1] || !tokens[2] || !tokens[3])
     {
@@ -20,14 +20,12 @@ int parse_sphere(t_scene *scene, char **tokens)
     sphere->center = parse_vector(tokens[1]);
     sphere->radius = ft_atof(tokens[2]) / 2.0;
     sphere->color = parse_color(tokens[3]);
-
-    char *texture_path = NULL;
     if (tokens[4] && tokens[4][0] != '#')
     {
         printf("Checking texture path: %s\n", tokens[4]);
 
-        char *extension = strrchr(tokens[4], '.');
-        if (extension && strcmp(extension, ".xpm") == 0)
+        char *extension = ft_strrchr(tokens[4], '.');
+        if (extension && ft_strcmp(extension, ".xpm") == 0)
         {
             texture_path = tokens[4];
             int fd = open(texture_path, O_RDONLY);
@@ -36,7 +34,7 @@ int parse_sphere(t_scene *scene, char **tokens)
                 free(sphere);
                 exit(EXIT_FAILURE);
             }
-            close(fd);  // Ferme le fichier après vérification
+            close(fd);
         }
         else
         {
@@ -56,9 +54,11 @@ int parse_sphere(t_scene *scene, char **tokens)
 
 void add_sphere(t_scene *scene, t_sphere *sphere, char *texture_path)
 {
-    t_list *new_node = malloc(sizeof(t_list));
-    t_object *object = malloc(sizeof(t_object));
+    t_list *new_node;
+    t_object *object;
 
+    new_node = malloc(sizeof(t_list));
+    object = malloc(sizeof(t_object));    
     if (!new_node || !object)
     {
         free(sphere);
@@ -73,11 +73,11 @@ void add_sphere(t_scene *scene, t_sphere *sphere, char *texture_path)
     {
         object->texture = mlx_xpm_file_to_image(scene->mlx, texture_path, &object->tex_width, &object->tex_height);
         if (!object->texture) {
-            fprintf(stderr, "Error\n");  // Affiche "Error" si la texture est invalide
+            fprintf(stderr, "Error\n");
             free(object);
             free(sphere);
             free(new_node);
-            exit(EXIT_FAILURE);  // Arrête le programme
+            exit(EXIT_FAILURE);
         }
         object->texture_data = mlx_get_data_addr(object->texture, &object->bpp, &object->line_len, &object->endian);
     }

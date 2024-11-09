@@ -51,9 +51,16 @@ typedef enum e_object_type {
 
 typedef struct s_object {
     t_object_type type;
-    void *data; // Pointeur vers t_sphere, t_plane , t_hyperboloid ou t_cylinder
+    void *data;
     t_color color;
+    char *texture_path;
+    void *texture;
+    char *texture_data;
+    int tex_width;
+    int tex_height;
+    int bpp;       
+    int line_len;
+    int endian;
 }   t_object;
 
 #endif
-

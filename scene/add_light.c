@@ -4,7 +4,8 @@ void add_light(t_scene *scene, t_light *light)
 {
     t_list *new_node = malloc(sizeof(t_list));
 
-    if (!new_node) {
+    if (!new_node)
+    {
         // Gérer l'erreur d'allocation
         return;
     }

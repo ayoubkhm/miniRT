@@ -14,12 +14,18 @@ int parse_sphere(t_scene *scene, char **tokens)
         return (0);
 
     sphere->center = parse_vector(tokens[1]);
-    sphere->radius = ft_atof(tokens[2]) / 2.0; // Diviser par 2 si le diamètre est donné
+    sphere->radius = ft_atof(tokens[2]) / 2.0;
     sphere->color = parse_color(tokens[3]);
+
+    //printf("Sphere defined:\n");
+    //printf("  Center: {%.2f, %.2f, %.2f}\n", sphere->center.x, sphere->center.y, sphere->center.z);
+    //printf("  Radius: %.2f\n", sphere->radius);
+    //printf("  Color: {R:%d, G:%d, B:%d}\n", sphere->color.r, sphere->color.g, sphere->color.b);
 
     add_sphere(scene, sphere);
     return (1);
 }
+
 
 void add_sphere(t_scene *scene, t_sphere *sphere)
 {
@@ -27,12 +33,12 @@ void add_sphere(t_scene *scene, t_sphere *sphere)
     t_object *object = malloc(sizeof(t_object));
 
     if (!new_node || !object) {
-        // Gérer l'erreur d'allocation
         return;
     }
 
     object->type = SPHERE;
     object->data = sphere;
+    object->color = sphere->color; // Copie la couleur
 
     new_node->content = object;
     new_node->next = scene->objects;
@@ -56,6 +62,11 @@ int parse_plane(t_scene *scene, char **tokens)
     plane->normal = parse_vector(tokens[2]);
     plane->color = parse_color(tokens[3]);
 
+    // printf("Plane defined:\n");
+    // printf("  Point: {%.2f, %.2f, %.2f}\n", plane->point.x, plane->point.y, plane->point.z);
+    // printf("  Normal: {%.2f, %.2f, %.2f}\n", plane->normal.x, plane->normal.y, plane->normal.z);
+    // printf("  Color: {R:%d, G:%d, B:%d}\n", plane->color.r, plane->color.g, plane->color.b);
+
     add_plane(scene, plane);
     return (1);
 }
@@ -66,15 +77,14 @@ void add_plane(t_scene *scene, t_plane *plane)
     t_object *object = malloc(sizeof(t_object));
 
     if (!new_node || !object) {
-        // Gérer l'erreur d'allocation
         return;
     }
 
     object->type = PLANE;
     object->data = plane;
+    object->color = plane->color; // Copie la couleur
 
     new_node->content = object;
     new_node->next = scene->objects;
     scene->objects = new_node;
 }
-

@@ -58,10 +58,9 @@ int parse_sphere(t_scene *scene, char **tokens);
 int parse_plane(t_scene *scene, char **tokens);
 int parse_cylinder(t_scene *scene, char **tokens);
 
-
-t_hyperboloid *create_hyperboloid(t_vec center, t_vec axis, double a, double b, double c, double height, t_color color);
 int parse_hyperboloid(t_scene *scene, char **tokens);
-void free_hyperboloid(t_hyperboloid *hyperboloid);
+void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid);
+
 
 // Fonctions utilitaires
 t_vec   parse_vector(char *str);

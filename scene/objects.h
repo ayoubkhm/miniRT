@@ -32,13 +32,12 @@ typedef struct s_cylinder {
 } t_cylinder;
 
 typedef struct s_hyperboloid {
-    t_vec center;      // Centre de l'hyperboloïde
-    t_vec axis;        // Axe de symétrie
-    double a;          // Paramètre 'a' de l'équation
-    double b;          // Paramètre 'b' de l'équation
-    double c;          // Paramètre 'c' de l'équation
-    double height;     // Hauteur de l'hyperboloïde
-    t_color color;     // Couleur de l'hyperboloïde
+    t_vec base;
+    t_vec axis;
+    double diameter;
+    double radius;
+    double height;
+    t_color color;
 } t_hyperboloid;
 
 

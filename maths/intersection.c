@@ -6,6 +6,10 @@
 
 #define EPSILON 1e-6
 
+double vector_length(t_vec v)
+{
+    return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
 
 // bool intersect_plane(t_vec ray_origin, t_vec ray_dir, t_plane plane, double *t)
 // {
@@ -109,31 +113,87 @@ bool intersect_plane(t_vec ray_origin, t_vec ray_dir, t_plane *plane, double *t)
 // Fonction d'intersection pour le cylindre
 bool intersect_cylinder(t_vec ray_origin, t_vec ray_dir, t_cylinder cylinder, double *t)
 {
+    // Normalisation de l'axe du cylindre
+    t_vec axis = vector_normalize(cylinder.axis);
 
-        t_vec oc = vector_sub(cylinder.base, ray_origin);
-        t_vec d = vector_normalize(cylinder.axis);
+    // Calcul des composantes perpendiculaires
+    t_vec delta_p = vector_sub(ray_origin, cylinder.base);
+    t_vec v = vector_sub(ray_dir, scale_vec(axis, scalar_dot(ray_dir, axis)));
+    t_vec delta_p_v = vector_sub(delta_p, scale_vec(axis, scalar_dot(delta_p, axis)));
 
-        t_vec oc_proj = vector_sub(oc, (t_vec){scalar_dot(oc, d) * d.x, scalar_dot(oc, d) * d.y, scalar_dot(oc, d) * d.z});
-        t_vec ray_dir_proj = vector_sub(ray_dir, (t_vec){scalar_dot(ray_dir, d) * d.x, scalar_dot(ray_dir, d) * d.y, scalar_dot(ray_dir, d) * d.z});
+    double a = scalar_dot(v, v);
+    double b = 2 * scalar_dot(v, delta_p_v);
+    double c = scalar_dot(delta_p_v, delta_p_v) - cylinder.radius * cylinder.radius;
+    double discriminant = b * b - 4 * a * c;
 
-        double a = scalar_dot(ray_dir_proj, ray_dir_proj);
-        double b = 2 * scalar_dot(oc_proj, ray_dir_proj);
-        double c = scalar_dot(oc_proj, oc_proj) - cylinder.radius * cylinder.radius;
-        double discriminant = b * b - 4 * a * c;
+    if (discriminant < 0)
+        return false;
 
-        if (discriminant < 0) 
-                return 0;
+    double sqrt_discriminant = sqrt(discriminant);
+    double t0 = (-b - sqrt_discriminant) / (2 * a);
+    double t1 = (-b + sqrt_discriminant) / (2 * a);
 
-        double t0 = (-b - sqrt(discriminant)) / (2 * a);
-        // double t1 = (-b + sqrt(discriminant)) / (2 * a);
-        // *t = fmin(t0, t1);
-        *t = t0;
+    // Assurer que t0 <= t1
+    if (t0 > t1)
+    {
+        double temp = t0;
+        t0 = t1;
+        t1 = temp;
+    }
 
-        t_vec hit_point = (t_vec){ray_origin.x + *t * ray_dir.x, ray_origin.y + *t * ray_dir.y, ray_origin.z + *t * ray_dir.z};
-        double height_check = scalar_dot(vector_sub(hit_point, cylinder.base), d);
+    *t = INFINITY;
 
-        return (*t >= 0 && height_check >= 0 && height_check <= cylinder.height);
+    // Vérifier les deux racines pour l'intersection avec la surface latérale
+    for (int i = 0; i < 2; i++)
+    {
+        double t_candidate = (i == 0) ? t0 : t1;
+        if (t_candidate < 0)
+            continue; // Ignorer les intersections derrière l'origine du rayon
+
+        t_vec hit_point = vector_add(ray_origin, scale_vec(ray_dir, t_candidate));
+        double projection = scalar_dot(vector_sub(hit_point, cylinder.base), axis);
+
+        if (projection >= 0 && projection <= cylinder.height)
+        {
+            if (t_candidate < *t)
+                *t = t_candidate;
+        }
+    }
+
+    // Tester l'intersection avec la base inférieure
+    double denom = scalar_dot(ray_dir, axis);
+    if (fabs(denom) > 1e-6)
+    {
+        double t_candidate = scalar_dot(vector_sub(cylinder.base, ray_origin), axis) / denom;
+        if (t_candidate >= 0)
+        {
+            t_vec hit_point = vector_add(ray_origin, scale_vec(ray_dir, t_candidate));
+            double dist = vector_length(vector_sub(hit_point, cylinder.base));
+            if (dist <= cylinder.radius && t_candidate < *t)
+                *t = t_candidate;
+        }
+    }
+
+    // Tester l'intersection avec la base supérieure
+    t_vec top_center = vector_add(cylinder.base, scale_vec(axis, cylinder.height));
+    if (fabs(denom) > 1e-6)
+    {
+        double t_candidate = scalar_dot(vector_sub(top_center, ray_origin), axis) / denom;
+        if (t_candidate >= 0)
+        {
+            t_vec hit_point = vector_add(ray_origin, scale_vec(ray_dir, t_candidate));
+            double dist = vector_length(vector_sub(hit_point, top_center));
+            if (dist <= cylinder.radius && t_candidate < *t)
+                *t = t_candidate;
+        }
+    }
+    //printf("Quadratic coefficients: a = %f, b = %f, c = %f, discriminant = %f\n", a, b, c, discriminant);
+
+    // Retourner vrai si une intersection valide a été trouvée
+    return (*t < INFINITY);
 }
+
+
 
 bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere sphere, double *t)
 {

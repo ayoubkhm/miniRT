@@ -23,10 +23,10 @@ LIBFT_FLAGS = -L$(LIBFT_DIR) -lft
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
-    MLX_FLAGS = -L$(MLX_DIR) -lmlx42 -lXext -lX11 -lm -lbsd
+    MLX_FLAGS = -L$(MLX_DIR) -lmlx -lXext -lX11 -lbsd
 else ifeq ($(UNAME_S),Darwin)
-#     MLX_FLAGS = -L$(MLX_DIR) -lmlx42 -framework OpenGL -framework AppKit
-      MLX_FLAGS = -L /usr/X11/lib -l mlx -framework OpenGL -framework AppKit
+    MLX_FLAGS = -L/usr/local/lib -lmlx -framework OpenGL -framework AppKit
+#      MLX_FLAGS = -L /usr/X11/lib -l mlx -framework OpenGL -framework AppKit
 endif
 
 # Fichiers sources
@@ -40,7 +40,6 @@ SRC = $(SRCDIR)/main2.c \
 	  $(SCENEDIR)/parse_scene.c \
 	  $(SCENEDIR)/utils_list.c \
 	  $(SCENEDIR)/utils_parse.c \
-	  $(SRCDIR)/testing.c \
 	  $(MATHSDIR)/vector_op.c \
 	  $(MATHSDIR)/intersection.c
       # Ajoutez $(CAMERADIR)/camera.c ici lorsque vous aurez le fichier camera.c
@@ -55,7 +54,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	@$(MAKE) -C $(LIBFT_DIR)       # Compile libft si nécessaire
 	@$(MAKE) -C $(MLX_DIR)         # Compile mlx si nécessaire
-	@$(CC) $(CFLAGS) $(MLX_FLAGS) -o $(NAME) $(OBJ) $(LIBFT_FLAGS)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJ) $(LIBFT_FLAGS) $(MLX_FLAGS) -lm
 	@echo "Compilation de $(NAME) terminée."
 
 # Compilation des objets

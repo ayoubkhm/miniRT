@@ -49,7 +49,7 @@ t_vec compute_ray(int i, int j, t_cam camera)
 }
 
 // Taille des carreaux du damier
-#define CHECKER_SIZE 0.5
+#define CHECKER_SIZE 2.5
 
 t_color apply_checkerboard(t_vec point, t_color color1, t_color color2)
 {

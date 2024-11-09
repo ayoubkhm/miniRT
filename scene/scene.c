@@ -1,7 +1,6 @@
 #include "scene.h"
 #include <mlx.h>
 
-
 void init_scene(t_scene *scene)
 {
     scene->camera_defined = 0;
@@ -11,7 +10,6 @@ void init_scene(t_scene *scene)
     scene->mlx = mlx_init();
     scene->win = mlx_new_window(scene->mlx, 800, 600, "TEST BY AYOUB");
 }
-
 
 int load_scene(t_scene *scene, const char *filename)
 {
@@ -44,16 +42,12 @@ int load_scene(t_scene *scene, const char *filename)
         }
         free(trimmed_line);
     }
-
     free(line);
     fclose(file);
-
-    // Vérifier que la caméra et la lumière ambiante ont été définies
     if (!scene->camera_defined || !scene->ambient_light_defined) {
         fprintf(stderr, "Error: Camera or ambient light not defined\n");
         return (0);
     }
-
     return (1);
 }
 

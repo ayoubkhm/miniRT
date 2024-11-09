@@ -30,13 +30,14 @@ else ifeq ($(UNAME_S),Darwin)
 endif
 
 # Fichiers sources
-SRC = $(SRCDIR)/main2.c \
+SRC = $(SRCDIR)/main.c \
       $(SCENEDIR)/scene.c \
       $(SCENEDIR)/add_light.c \
 	  $(SCENEDIR)/free_scene.c \
 	  $(SCENEDIR)/parse_cylinder.c \
 	  $(SCENEDIR)/parse_hyperboloid.c \
-	  $(SCENEDIR)/parse_objects.c \
+	  $(SCENEDIR)/parse_sphere.c \
+	  $(SCENEDIR)/parse_plane.c \
 	  $(SCENEDIR)/parse_scene.c \
 	  $(SCENEDIR)/utils_list.c \
 	  $(SCENEDIR)/utils_parse.c \

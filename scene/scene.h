@@ -29,7 +29,7 @@ typedef struct s_cam {
 // Lumière ponctuelle
 typedef struct s_light {
     t_vec   position;
-    double  ratio; // Intensité (entre 0.0 et 1.0)
+    double  ratio;
     t_color color;
 } t_light;
 
@@ -37,8 +37,8 @@ typedef struct s_light {
 typedef struct s_scene {
     t_cam       camera;
     t_am_light  ambient_light;
-    t_list     *lights;                // Liste des lumières ponctuelles
-    t_list     *objects;               // Liste des objets (t_object *)
+    t_list     *lights;
+    t_list     *objects;
     int         camera_defined;
     int         ambient_light_defined;
     void    *mlx;
@@ -59,8 +59,7 @@ int parse_plane(t_scene *scene, char **tokens);
 int parse_cylinder(t_scene *scene, char **tokens);
 
 int parse_hyperboloid(t_scene *scene, char **tokens);
-void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid);
-
+void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid, char *texture_path);
 
 // Fonctions utilitaires
 t_vec   parse_vector(char *str);
@@ -71,9 +70,9 @@ void    ft_lstadd_front(t_list **lst, t_list *new_node);
 
 // Fonctions d'ajout d'objets et de lumières
 void add_light(t_scene *scene, t_light *light);
-void add_sphere(t_scene *scene, t_sphere *sphere);
-void add_plane(t_scene *scene, t_plane *plane);
-void add_cylinder(t_scene *scene, t_cylinder *cylinder);
+void add_sphere(t_scene *scene, t_sphere *sphere, char *texture_path);
+void add_plane(t_scene *scene, t_plane *plane, char *texture_path);
+void add_cylinder(t_scene *scene, t_cylinder *cylinder, char *texture_path);
 
 // Fonctions de libération de la mémoire
 void free_scene(t_scene *scene);

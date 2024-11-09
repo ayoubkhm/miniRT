@@ -8,13 +8,6 @@
 #define WIDTH 800
 #define HEIGHT 600
 
-// Déclarations globales pour accéder à pl et cyl dans les fonctions
-t_scene scene;
-t_cylinder cyl;
-t_plane pl;
-t_sphere sphere;
-
-
 void close_window(t_scene *scene) 
 {
     mlx_destroy_window(scene->mlx, scene->win);
@@ -23,7 +16,7 @@ void close_window(t_scene *scene)
 
 t_vec compute_ray(int i, int j, t_cam camera) {
     float aspect_ratio = (float)WIDTH / (float)HEIGHT;
-    float fov_rad = camera.fov * M_PI / 180.0; // Conversion en radians
+    float fov_rad = camera.fov * M_PI / 180.0;
     float viewport_height = 2.0 * tan(fov_rad / 2.0);
     float viewport_width = viewport_height * aspect_ratio;
     

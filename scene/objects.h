@@ -61,6 +61,7 @@ typedef struct s_object {
     int bpp;       
     int line_len;
     int endian;
+    bool flag_checkerboard;
 }   t_object;
 
 #endif

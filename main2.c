@@ -5,9 +5,15 @@
 #include "maths/mini_maths.h"
 #include <mlx.h>
 
-
 #define WIDTH 800
 #define HEIGHT 600
+
+// Déclarations globales pour accéder à pl et cyl dans les fonctions
+t_scene scene;
+t_cylinder cyl;
+t_plane pl;
+t_sphere sphere;
+
 
 void close_window(t_scene *scene) 
 {
@@ -16,142 +22,179 @@ void close_window(t_scene *scene)
 }
 
 t_vec compute_ray(int i, int j, t_cam camera) {
-    // Aspect ratio
     float aspect_ratio = (float)WIDTH / (float)HEIGHT;
-
-    // Calcul de camera_right comme produit vectoriel entre le haut du monde et la direction de la caméra
-//     t_vec world_up = {0, 0, 1};  // direction "haut" dans le monde 3D global
-    t_vec camera_right = vector_normalize(vector_cross(camera.direction, (t_vec){0, 1, 0}));
-
-    // Calcul de camera_up comme produit vectoriel entre camera_dir et camera_right
-    t_vec camera_up = vector_normalize(vector_cross(camera.direction, camera_right));
-    // Calcul des dimensions de la vue
-    float viewport_height = 2.0 * tan(camera.fov / 2.0);
+    float fov_rad = camera.fov * M_PI / 180.0; // Conversion en radians
+    float viewport_height = 2.0 * tan(fov_rad / 2.0);
     float viewport_width = viewport_height * aspect_ratio;
-
-    // Calcul des coordonnées x et y du pixel dans le plan de projection
-    float x = (2 * (((float)i + 0.5) / WIDTH) - 1) * viewport_width / 2;
-    float y = (1 - 2 * (((float)j + 0.5) / HEIGHT)) * viewport_height / 2;
-
-    // Direction du rayon
-    t_vec pixel_position = vector_add(camera.position, vector_add(
-        scale_vec(camera_right, x),
-        scale_vec(camera_up, y)
-    ));
-    t_vec ray_direction = vector_normalize(vector_sub(pixel_position, camera.position));
-
-    // Retourne le rayon
+    
+    t_vec up = {0, 1, 0}; // Vecteur "up" du monde
+    t_vec camera_direction = vector_normalize(camera.direction);
+    
+    // Calcul des vecteurs de base de la caméra
+    t_vec camera_right = vector_normalize(vector_cross(camera_direction, up));
+    t_vec camera_up = vector_cross(camera_right, camera_direction); // Attention à l'ordre des arguments
+    
+    // Calcul des coordonnées x et y dans l'espace de la caméra
+    float pixel_ndc_x = (i + 0.5) / (float)WIDTH;  // Normalized Device Coordinate
+    float pixel_ndc_y = (j + 0.5) / (float)HEIGHT;
+    float pixel_screen_x = 2 * pixel_ndc_x - 1;
+    float pixel_screen_y = 1 - 2 * pixel_ndc_y;
+    
+    float pixel_camera_x = pixel_screen_x * viewport_width / 2.0;
+    float pixel_camera_y = pixel_screen_y * viewport_height / 2.0;
+    
+    // Direction du rayon dans l'espace caméra
+    t_vec ray_direction = vector_normalize(
+        vector_add(
+            vector_add(
+                scale_vec(camera_right, pixel_camera_x),
+                scale_vec(camera_up, pixel_camera_y)
+            ),
+            camera_direction // Ajoute la direction de la caméra
+        )
+    );
+    
     return ray_direction;
 }
 
-void render_scene(t_scene *scene, t_plane pl)
+
+void render_scene(t_scene *scene)
 {
-        int     i = 0;
-        int     j = 0;
-        int     col;
+    int i = 0;
+    int j = 0;
+    int col;
 
-        while (j < HEIGHT)
-        {
-                i = 0;
-                while (i < WIDTH)
-                {
-                        t_vec ray_dir = compute_ray(i, j, scene->camera);
+    printf("Starting render...\n");
 
-                        double t_plane;
-                        bool hit_plane = intersect_plane(scene->camera.position, ray_dir, &pl, &t_plane);
-                        // bool hit_cylinder = intersect_cylinder(scene->camera.position, ray_dir, cyl, &t_cylinder);
-                        // bool hit_sphere = intersect_sphere(scene->camera.position, ray_dir, sp, &t_sphere);
+    if (!scene->mlx || !scene->win) {
+        fprintf(stderr, "Error: mlx or window not initialized.\n");
+        return;
+    }
 
-                        // if (hit_plane > 0 && hit_cylinder > 0) printf("\nplane : %d cylindre : %d\n", hit_plane > 0, hit_cylinder > 0);
+    // Parcours des objets de la scène pour vérifier leurs couleurs
+    t_list *current = scene->objects;
+    while (current) {
+        t_object *object = (t_object *)current->content;
 
-                        t_color color = {255, 255, 255}; // Fond blanc par défaut ?¿
-
-                        if (hit_plane)
-                        {
-                                if (pl.flag_qud)
-                                {
-                                        printf("Flags qud : %d\n", 1);
-                                        color = pl.quadrillage;
-                                }
-                                else
-                                        color = pl.color;
-                        }
-                        col = color.b + (color.g << 8) + (color.r << 16);
-                        mlx_pixel_put(scene->mlx, scene->win, i, j, col);
-                        i++;
-                }
-                j++;
+        // Affiche les informations de couleur pour chaque type d'objet une seule fois
+        if (object->type == PLANE) {
+            printf("Plane color: {R:%d, G:%d, B:%d}\n",
+                   object->color.r, object->color.g, object->color.b);
+        } else if (object->type == CYLINDER) {
+            printf("Cylinder color: {R:%d, G:%d, B:%d}\n",
+                   object->color.r, object->color.g, object->color.b);
+        } else if (object->type == SPHERE) {
+            printf("Sphere color: {R:%d, G:%d, B:%d}\n",
+                   object->color.r, object->color.g, object->color.b);
         }
+
+        current = current->next;
+    }
+
+    // Boucle pour chaque pixel de l'écran
+    while (j < HEIGHT) {
+        i = 0;
+        while (i < WIDTH) {
+            t_vec ray_dir = compute_ray(i, j, scene->camera);
+            t_color color = {255, 255, 255}; // Fond blanc par défaut
+            double t_min = INFINITY; // Distance minimale pour l'objet le plus proche
+
+            // Parcours des objets de la scène pour le rendu
+            current = scene->objects;
+            while (current) {
+                t_object *object = (t_object *)current->content;
+                double t = INFINITY; // Distance d'intersection temporaire
+                bool hit = false;    // Indicateur de collision
+
+                // Vérification de l'intersection en fonction du type d'objet
+                if (object->type == PLANE) {
+                    hit = intersect_plane(scene->camera.position, ray_dir, (t_plane *)object->data, &t);
+                } else if (object->type == CYLINDER) {
+                    hit = intersect_cylinder(scene->camera.position, ray_dir, *(t_cylinder *)object->data, &t);
+                } else if (object->type == SPHERE) {
+                    hit = intersect_sphere(scene->camera.position, ray_dir, *(t_sphere *)object->data, &t);
+                }
+
+                // Si une intersection est trouvée et qu'elle est plus proche, mettre à jour `color`
+                if (hit && t < t_min && t > 0) {
+                    t_min = t;
+                    color = object->color; // Utilise la couleur de l'objet
+                }
+
+                current = current->next;
+            }
+
+            // Conversion de la couleur en format RGB pour `mlx_pixel_put`
+            col = color.b + (color.g << 8) + (color.r << 16);
+
+            // Dessin du pixel
+            if (scene->mlx && scene->win) {
+                mlx_pixel_put(scene->mlx, scene->win, i, j, col);
+            }
+
+            i++;
+        }
+        j++;
+    }
+
+    printf("Render completed.\n");
 }
 
-int key_press(int keycode, t_scene *scene, t_plane pl) {
+
+
+
+
+
+
+
+
+
+
+int key_press(int keycode, t_scene *scene) {
     if (keycode == 53) { // Touche Échap (code 53 sur Mac)
         close_window(scene);
-    }
-    // Mouvements WASD (ajuster les codes selon ton OS si nécessaire)
-    else if (keycode == 87) { // W - Avancer
+    } else if (keycode == 87) { // W - Avancer
         scene->camera.position.z += 1;
-    }
-    else if (keycode == 1) { // S - Reculer
+    } else if (keycode == 1) { // S - Reculer
         scene->camera.position.z -= 1;
-    }
-    else if (keycode == 0) { // A - Gauche
+    } else if (keycode == 0) { // A - Gauche
         scene->camera.position.x -= 1;
-    }
-    else if (keycode == 2) { // D - Droite
+    } else if (keycode == 2) { // D - Droite
         scene->camera.position.x += 1;
     }
-    // Redessiner la scène après chaque mouvement
-        render_scene(scene, pl);
+    render_scene(scene); // Appel avec un seul argument
     return (0);
 }
 
 
 int main(int argc, char **argv)
 {
-        t_scene         scene;
-        t_plane         pl;
-        t_cylinder      cyl;
+    if (argc != 2) {
+        printf("Usage: %s <scene_file.rt>\n", argv[0]);
+        return (EXIT_FAILURE);
+    }
 
+    printf("Initialisation\n");
 
-        if (argc != 2)
-                return (ft_error());
-        init_scene(&scene);
-        if (!load_scene(&scene, argv[1]))
-                return (ft_error());
+    // Initialisation de la scène
+    init_scene(&scene);
 
-        // pl = *(t_plane *)scene.objects->content;
-        // cyl = *(t_cylinder *)scene.objects->next->content;
-
-        cyl.base = (t_vec){10, 0, 0};
-        cyl.axis = (t_vec){0, 1, 0};
-        cyl.color = (t_color){0, 0, 255};
-        cyl.radius = 2;
-        cyl.height = 0;
-
-        pl.color  = (t_color){0, 255, 0};
-        pl.quadrillage = (t_color){255 - pl.color.r, 255 - pl.color.g, 255 - pl.color.b};
-        pl.normal = (t_vec){0, 1, 0};
-        pl.point = (t_vec){0, 0, 0};
-
-
-        printf("Scene loaded successfully:\n");
-        printf("Camera position: %.1f, %.1f, %.1f\n", scene.camera.position.x, scene.camera.position.y, scene.camera.position.z);
-        printf("Camera direction : %.1f, %.1f, %.1f\n", scene.camera.direction.x, scene.camera.direction.y, scene.camera.direction.z);
-        printf("Ambient light ratio: %.1f\n", scene.ambient_light.ratio);
-        printf("Scene loaded successfully:\n");
-        printf("Cylinder propreties : axis = {%.1f, %.1f, %.1f}, base = {%.1f, %.1f, %.1f}", cyl.axis.x, cyl.axis.y, cyl.axis.z, cyl.base.x, cyl.base.y, cyl.base.z);
-        printf(", radius = %.1f, hauteur = %.1f\n", cyl.radius, cyl.height);
-
-        printf("\nplan props : normal ={%.1f, %.1f, %.1f} point = {%.1f, %.1f, %.1f}\n", pl.normal.x, pl.normal.y, pl.normal.z, pl.point.x, pl.point.y, pl.point.z);
-        // mlx = mlx_init();
-        // win = mlx_new_window(mlx, WIDTH, HEIGHT, "Cylindre et plan");
-
-        render_scene(&scene, pl);
-        mlx_key_hook(scene.win, key_press, &scene);
-
-
-        mlx_loop(scene.mlx);
+    // Chargement de la scène à partir du fichier
+    if (!load_scene(&scene, argv[1])) {
+        printf("Erreur lors du chargement de la scène.\n");
         free_scene(&scene);
-        return (EXIT_SUCCESS);
+        return (EXIT_FAILURE);
+    }
+
+    printf("Scene loaded successfully:\n");
+    // Rendu de la scène
+    render_scene(&scene);
+
+    // Gestion des événements clavier et boucle MLX
+    mlx_key_hook(scene.win, key_press, &scene);
+    mlx_loop(scene.mlx);
+
+    // Libération des ressources de la scène
+    free_scene(&scene);
+    return (EXIT_SUCCESS);
 }

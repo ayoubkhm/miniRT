@@ -101,6 +101,11 @@ int parse_camera(t_scene *scene, char **tokens)
         return (0);
     }
 
+    printf("Camera defined:\n");
+    printf("  Position: {%.2f, %.2f, %.2f}\n", scene->camera.position.x, scene->camera.position.y, scene->camera.position.z);
+    printf("  Direction: {%.2f, %.2f, %.2f}\n", scene->camera.direction.x, scene->camera.direction.y, scene->camera.direction.z);
+    printf("  FOV: %.2f\n", scene->camera.fov);
+
     scene->camera_defined = 1;
     return (1);
 }

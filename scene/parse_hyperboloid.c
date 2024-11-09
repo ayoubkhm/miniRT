@@ -1,54 +1,56 @@
 #include "scene.h"
 
-t_hyperboloid *create_hyperboloid(t_vec center, t_vec axis, double a, double b, double c, double height, t_color color)
-{
-    t_hyperboloid *hyperboloid = malloc(sizeof(t_hyperboloid));
-    if (!hyperboloid)
-        return (NULL);
-    hyperboloid->center = center;
-    hyperboloid->axis = axis;
-    hyperboloid->a = a;
-    hyperboloid->b = b;
-    hyperboloid->c = c;
-    hyperboloid->height = height;
-    hyperboloid->color = color;
-    return (hyperboloid);
-}
-
 int parse_hyperboloid(t_scene *scene, char **tokens)
 {
-    if (!tokens[1] || !tokens[2] || !tokens[3] || !tokens[4] || !tokens[5] || !tokens[6] || !tokens[7]) {
+    t_hyperboloid *hyperboloid;
+
+    // Vérifier que tous les tokens nécessaires sont présents
+    if (!tokens[1] || !tokens[2] || !tokens[3] || !tokens[4] || !tokens[5]) {
         fprintf(stderr, "Error: Invalid hyperboloid definition\n");
         return (0);
     }
 
-    t_vec center = parse_vector(tokens[1]);
-    t_vec axis = parse_vector(tokens[2]);
-    double a = atof(tokens[3]);
-    double b = atof(tokens[4]);
-    double c = atof(tokens[5]);
-    double height = atof(tokens[6]);
-    t_color color = parse_color(tokens[7]);
-
-    t_hyperboloid *hyperboloid = create_hyperboloid(center, axis, a, b, c, height, color);
+    // Allouer de la mémoire pour l'hyperboloïde
+    hyperboloid = malloc(sizeof(t_hyperboloid));
     if (!hyperboloid)
         return (0);
 
-    t_object *object = malloc(sizeof(t_object));
-    if (!object) {
-        free_hyperboloid(hyperboloid);
-        return (0);
-    }
-    object->type = HYPERBOLOID;
-    object->data = hyperboloid;
-    object->color = color;
+    // Parser les valeurs des tokens
+    hyperboloid->base = parse_vector(tokens[1]);
+    hyperboloid->axis = parse_vector(tokens[2]);
+    hyperboloid->diameter = ft_atof(tokens[3]);
+    hyperboloid->radius = ft_atof(tokens[3]) / 2.0;
+    hyperboloid->height = ft_atof(tokens[4]);
+    hyperboloid->color = parse_color(tokens[5]);
 
-    ft_lstadd_front(&scene->objects, ft_lstnew(object));
+    // Affichage pour vérification
+    printf("Hyperboloid defined:\n");
+    printf("  Base: {%.2f, %.2f, %.2f}\n", hyperboloid->base.x, hyperboloid->base.y, hyperboloid->base.z);
+    printf("  Axis: {%.2f, %.2f, %.2f}\n", hyperboloid->axis.x, hyperboloid->axis.y, hyperboloid->axis.z);
+    printf("  Radius: %.2f\n", hyperboloid->radius);
+    printf("  Height: %.2f\n", hyperboloid->height);
+    printf("  Color: {R:%d, G:%d, B:%d}\n", hyperboloid->color.r, hyperboloid->color.g, hyperboloid->color.b);
+
+    // Ajouter l'hyperboloïde à la scène
+    add_hyperboloid(scene, hyperboloid);
 
     return (1);
 }
 
-void free_hyperboloid(t_hyperboloid *hyperboloid)
+void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid)
 {
-    free(hyperboloid);
+    t_list *new_node = malloc(sizeof(t_list));
+    t_object *object = malloc(sizeof(t_object));
+
+    if (!new_node || !object) {
+        return;
+    }
+
+    object->type = HYPERBOLOID;
+    object->data = hyperboloid;
+    object->color = hyperboloid->color; // Copie la couleur
+
+    new_node->content = object;
+    new_node->next = scene->objects;
+    scene->objects = new_node;
 }

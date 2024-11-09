@@ -1,11 +1,9 @@
-# Exemple de scène RT avec différents objets
-
 A 0.5 255,255,255             # Lumière ambiante avec un ratio de 0.5 et couleur blanche
-C 0,0,20 0,0,-1 70            # Caméra positionnée à (0, 0, 20) regardant vers -Z avec un FOV de 70
+C 0,10,-10 0.4,-0.1,0.9 60         # Caméra positionnée à (0, 0, 20) regardant vers le bas avec un FOV de 60
 L 10,10,10 0.7 255,255,255    # Lumière ponctuelle à (10, 10, 10) avec une intensité de 0.7 et couleur blanche
 
 # Objets
-sp 0,0,0 5 255,0,0            # Sphère rouge de rayon 5 centrée à l'origine
-pl 0,-5,0 0,1,0 0,255,0       # Plan vert au point (0, -5, 0) avec une normale pointant vers Y (0, 1, 0)
-cy 5,0,0 0,1,0 2 10 0,0,255   # Cylindre bleu avec base à (5, 0, 0), axe aligné avec Y (0, 1, 0), diamètre 2, hauteur 10
-hy 9,4,3 0,1,0 1 1 1 10 255,0,255
+sp 10,5,0 2 255,0,0           # Sphère rouge de rayon 5 centrée à l'origine
+pl 0,0,0 0,1,0 0,255,0       # Plan vert au point (0, -5, 0) avec une normale pointant vers Y (0, 1, 0)
+cy 5,5,0 0,1,0 2 8 0,0,255   # Cylindre bleu avec base à (5, 0, 0), axe aligné avec Y (0, 1, 0), diamètre 2, hauteur 10
+# hy 9,4,3 0,1,0 1 1 1 10 255,0,255

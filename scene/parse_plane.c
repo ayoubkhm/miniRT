@@ -1,12 +1,13 @@
-#include "scene.h"
-#include <mlx.h>
-#include <string.h>
-#include <fcntl.h>
+#include "../includes/minirt.h"
 
 int parse_plane(t_scene *scene, char **tokens)
 {
     t_plane *plane;
+    char *texture_path;
+    char *extension;
+    int fd;
 
+    texture_path = NULL;
     if (!tokens[1] || !tokens[2] || !tokens[3])
     {
         fprintf(stderr, "Error: Invalid plane definition\n");
@@ -20,23 +21,20 @@ int parse_plane(t_scene *scene, char **tokens)
     plane->point = parse_vector(tokens[1]);
     plane->normal = parse_vector(tokens[2]);
     plane->color = parse_color(tokens[3]);
-
-    char *texture_path = NULL;
     if (tokens[4] && tokens[4][0] != '#')
     {
-        printf("Checking texture path: %s\n", tokens[4]);
-
-        char *extension = strrchr(tokens[4], '.');
-        if (extension && strcmp(extension, ".xpm") == 0)
+        //printf("Checking texture path: %s\n", tokens[4]);
+        extension = ft_strrchr(tokens[4], '.');
+        if (extension && ft_strcmp(extension, ".xpm") == 0)
         {
             texture_path = tokens[4];
-            int fd = open(texture_path, O_RDONLY);
+            fd = open(texture_path, O_RDONLY);
             if (fd == -1) {
                 fprintf(stderr, "Error: Texture file '%s' not found.\n", texture_path);
                 free(plane);
                 exit(EXIT_FAILURE);
             }
-            close(fd);  // Ferme le fichier après vérification
+            close(fd);
         }
         else
         {
@@ -47,7 +45,7 @@ int parse_plane(t_scene *scene, char **tokens)
     }
     else if (tokens[4] && tokens[4][0] == '#')
     {
-        printf("No texture path provided or it's a comment. Continuing without texture.\n");
+        //printf("No texture path provided or it's a comment. Continuing without texture.\n");
     }
 
     add_plane(scene, plane, texture_path);
@@ -64,11 +62,9 @@ void add_plane(t_scene *scene, t_plane *plane, char *texture_path)
         free(plane);
         return;
     }
-
     object->type = PLANE;
     object->data = plane;
     object->color = plane->color;
-
     if (texture_path)
     {
         object->texture = mlx_xpm_file_to_image(scene->mlx, texture_path, &object->tex_width, &object->tex_height);
@@ -86,7 +82,6 @@ void add_plane(t_scene *scene, t_plane *plane, char *texture_path)
         object->texture = NULL;
         object->texture_data = NULL;
     }
-
     new_node->content = object;
     new_node->next = scene->objects;
     scene->objects = new_node;

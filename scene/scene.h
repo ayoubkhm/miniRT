@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 # define SCENE_H
-
+# define WIDTH 800
+# define HEIGHT 600
 # include "../includes/types.h"
 # include "../lib/libft/libft.h"
 # include "objects.h"
@@ -43,6 +44,19 @@ typedef struct s_scene {
     int         ambient_light_defined;
     void    *mlx;
     void    *win;
+    void *image;
+    char *image_data;    
+    int         bpp;
+    int         line_len;
+    int         endian;
+    bool move_forward;
+    bool move_backward;
+    bool move_left;
+    bool move_right;
+    bool rotate_left;
+    bool rotate_right;
+    bool rotate_up;
+    bool rotate_down;
 } t_scene;
 
 //scene.c

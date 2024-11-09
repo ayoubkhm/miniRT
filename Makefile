@@ -31,6 +31,8 @@ endif
 
 # Fichiers sources
 SRC = $(SRCDIR)/main.c \
+      $(SRCDIR)/mlx_utils.c \
+	  $(SRCDIR)/rendering.c \
       $(SCENEDIR)/scene.c \
       $(SCENEDIR)/add_light.c \
 	  $(SCENEDIR)/free_scene.c \

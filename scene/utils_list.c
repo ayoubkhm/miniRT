@@ -1,4 +1,4 @@
-#include "scene.h"
+#include "../includes/minirt.h"
 
 t_list  *ft_lstnew(void *content)
 {

@@ -42,7 +42,6 @@ SRC = $(SRCDIR)/main2.c \
 	  $(SCENEDIR)/utils_parse.c \
 	  $(MATHSDIR)/vector_op.c \
 	  $(MATHSDIR)/intersection.c
-      # Ajoutez $(CAMERADIR)/camera.c ici lorsque vous aurez le fichier camera.c
 
 # Fichiers objets
 OBJ = $(SRC:.c=.o)

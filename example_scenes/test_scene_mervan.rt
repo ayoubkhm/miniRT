@@ -3,5 +3,5 @@ C 0,15,0 1,-1,0 60            # Caméra positionnée à (0, 0, 20) regardant ver
 L 10,20,0 0.7 255,255,255    # Lumière ponctuelle à (10, 10, 10) avec une intensité de 0.7 et couleur blanche
 
 sp 10,0,0 5 255,0,0            # Sphère rouge de rayon 5 centrée à l'origine
-# pl 0,0,0        0,1,0   0,255,0          # Plan vert au point (0, 0, 0) avec une normale pointant vers Z (0, 0, 1)
+pl 0,0,0        0,1,0   0,100,0          # Plan vert au point (0, 0, 0) avec une normale pointant vers Z (0, 0, 1)
 # cy 10,0,0       0,1,0    2      8       0,0,255   # Cylindre bleu avec base à (10, 0, 0), axe aligné avec Z (0, 0, 1), diamètre 2, hauteur 8

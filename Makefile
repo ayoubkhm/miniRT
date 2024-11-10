@@ -44,7 +44,8 @@ SRC = $(SRCDIR)/main.c \
 	  $(SCENEDIR)/utils_list.c \
 	  $(SCENEDIR)/utils_parse.c \
 	  $(MATHSDIR)/vector_op.c \
-	  $(MATHSDIR)/intersection.c
+	  $(MATHSDIR)/intersection.c \
+	  $(MATHSDIR)/color_op.c
 
 # Fichiers objets
 OBJ = $(SRC:.c=.o)

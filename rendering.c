@@ -73,12 +73,17 @@ void render_scene(t_scene *scene)
     int i = 0, j = 0;
     t_vec ray_dir;
     t_color color; // Blanc par défaut
-    t_vec   n = (t_vec){0, 0, 0};
-    t_vec   l = (t_vec){0, 0, 0};
+    t_vec hit_to_light = (t_vec){0, 0, 0};
+    t_vec hit_dir = (t_vec){0, 0, 0};
+    t_vec hit_point = (t_vec){0, 0, 0};
     double t_min;
     double t;
     t_object *object;
     bool hit;
+    t_light light = *(t_light *)(scene->lights->content);
+    // t_am_light amb = (t_am_light)(scene->ambient_light);
+
+
 
 
     // Affiche la position de la caméra avant chaque rendu
@@ -112,12 +117,15 @@ void render_scene(t_scene *scene)
                 // Intersection en fonction du type d'objet
                 if (object->type == PLANE)
                 {
+                    t_plane plane = *(t_plane *)object->data;
                     hit = intersect_plane(scene->camera.position, ray_dir, (t_plane *)object->data, &t);
                     if (hit)
                     {
                         t_vec hit_point = vector_add(scene->camera.position, scale_vec(ray_dir, t));
                         u = fabs(hit_point.x) - floor(fabs(hit_point.x));
                         v = fabs(hit_point.z) - floor(fabs(hit_point.z));
+                        hit_dir = vector_sub(hit_point, scale_vec(plane.normal, 2 * scalar_dot(plane.normal, hit_point)));
+                        hit_to_light = vector_normalize(vector_sub(light.position, hit_point));
                     }
                 }
                 else if (object->type == CYLINDER)
@@ -128,16 +136,11 @@ void render_scene(t_scene *scene)
                     if (hit)
                     {
                         t_sphere *sphere = (t_sphere *)object->data;
-                        n = vector_sub(scale_vec(scene->camera.position, t), sphere->center);
-                        // n = scale_vec(sphere->center, t);
-                        t_light light = *(t_light *)(scene->lights->content);
-                        l = vector_sub(light.position, n);
-                        n  = vector_normalize(n);
-                        l = vector_normalize(l);
-                        t_vec hit_point = vector_add(scene->camera.position, scale_vec(ray_dir, t));
-                        t_vec hit_dir = vector_normalize(vector_sub(hit_point, sphere->center));
+                        hit_point = vector_add(scene->camera.position, scale_vec(ray_dir, t));
+                        hit_dir = vector_normalize(vector_sub(hit_point, sphere->center));
                         u = 0.5 + atan2(hit_dir.z, hit_dir.x) / (2 * M_PI);
                         v = 0.5 - asin(hit_dir.y) / M_PI;
+                        hit_to_light = vector_normalize(vector_sub(light.position, hit_point));
                     }
                 }
                 else if (object->type == HYPERBOLOID)
@@ -169,11 +172,10 @@ void render_scene(t_scene *scene)
                     }
                     else
                     {
-                        if (object->type == SPHERE)
+                        if (object->type == SPHERE || object->type == PLANE)
                         {
-                            print_position_or_vect(l, "Direction avec la lumiere");
-                            print_position_or_vect(n, "Normal avec la sphere");
-                            color = (t_color){object->color.r * fmax(scalar_dot(n, l), 0), object->color.g * fmax(scalar_dot(n, l), 0), object->color.b * fmax(scalar_dot(n, l), 0)};
+                            color = color_scale(object->color, fmax(scalar_dot(hit_dir, hit_to_light), 0));
+                            // color = color_add(object->color, color_scale(color, 0.20));
                         }
                         else
                             color = object->color;

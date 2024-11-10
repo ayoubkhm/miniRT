@@ -18,6 +18,10 @@ bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere sphere, double *
 bool intersect_hyperboloid(t_vec ray_origin, t_vec ray_dir, t_hyperboloid *hyperboloid, double *t);
 
 double vector_length(t_vec v);
+t_color color_scale(t_color color, double k);
+t_color color_add(t_color color, t_color c);
+
+
 
 
 

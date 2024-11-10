@@ -54,61 +54,6 @@ bool intersect_plane(t_vec ray_origin, t_vec ray_dir, t_plane *plane, double *t)
     return false;
 }
 
-// bool intersect_plane(t_vec ray_origin, t_vec ray_dir, t_plane *plane, double *t)
-// {
-//     double denom = scalar_dot(plane->normal, ray_dir);
-
-//     if (fabs(denom) > EPSILON)
-//     {
-//         t_vec paul = vector_sub(plane->point, ray_origin);
-//         *t = scalar_dot(paul, plane->normal) / denom;
-
-//         if (*t > 0)
-//         {
-//             // Point d'intersection
-//             t_vec intersection = vector_add(ray_origin, scale_vec(ray_dir, *t));
-
-//             // Taille de chaque cellule du quadrillage
-//             double cell_size = 8.0;
-
-//             // Déterminer si l'on est dans une cellule noire ou blanche
-//             int cell_x = (int)(fabs(intersection.x) / cell_size);
-//             int cell_z = (int)(fabs(intersection.z) / cell_size);
-
-//             // Alternance quadrillage : si la somme des cellules est paire, on colorie différemment
-//             plane->flag_qud = (cell_x + cell_z) % 2;
-
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-
-// bool	cylinder_inter(t_vec ray_or, t_vec ray_dir, t_cylinder *cy, double *hit)
-// {
-// 	t_plane	pl;
-// 	double	tmp_hit;
-
-// 	*hit = INFINITY;
-// 	pl.point = cy->base;
-// 	pl.normal = cy->axis;
-// 	if (intersect_plane(ray_or, ray_dir, pl, &tmp_hit)
-// 		&& distance(tmp_hit, cy->base)
-// 		<= cy->radius && *hit > tmp_hit.t)
-// 		*hit = tmp_hit;
-// 	pl.coords = cy->base;
-// 	if (plane_inter(r, &pl, &tmp_hit)
-// 		&& distance(tmp_hit.phit, cy->p2) <= cy->diameter * 0.5
-// 		&& hit->t > tmp_hit.t)
-// 		*hit = tmp_hit;
-// 	if (infinite_cyl_inter(r, cy, &tmp_hit)
-// 		&& pow(distance(cy->coords, tmp_hit.phit), 2)
-// 		<= pow(cy->height * 0.5, 2) + cy->r2
-// 		&& hit->t > tmp_hit.t)
-// 		*hit = tmp_hit;
-// 	return (hit->t < INFINITY && hit->t > EPSILON);
-// }
 
 // Fonction d'intersection pour le cylindre
 bool intersect_cylinder(t_vec ray_origin, t_vec ray_dir, t_cylinder cylinder, double *t)
@@ -193,8 +138,6 @@ bool intersect_cylinder(t_vec ray_origin, t_vec ray_dir, t_cylinder cylinder, do
     return (*t < INFINITY);
 }
 
-
-
 bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere sphere, double *t)
 {
     t_vec oc = vector_sub(ray_origin, sphere.center);
@@ -208,6 +151,59 @@ bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere sphere, double *
     *t = fmin((-b - sqrt(discriminant)) / (2.0 * a), (-b + sqrt(discriminant)) / (2.0 * a));
     return (*t > 0);
 }
+
+bool intersect_hyperboloid(t_vec ray_origin, t_vec ray_dir, t_hyperboloid *hyperboloid, double *t)
+{
+    // Calcul des paramètres de l'hyperboloïde
+    double a = hyperboloid->radius;
+    double b = hyperboloid->radius;
+    double c = hyperboloid->height / 2.0; // Hauteur / 2 pour centrer autour de l'axe
+
+    // Calcul du vecteur du rayon par rapport à la base de l'hyperboloïde
+    t_vec oc = vector_sub(ray_origin, hyperboloid->base);
+
+    // Projection des directions et origine dans le repère local de l'hyperboloïde
+    double dx = ray_dir.x;
+    double dy = ray_dir.y;
+    double dz = ray_dir.z;
+
+    double ox = oc.x;
+    double oy = oc.y;
+    double oz = oc.z;
+
+    // Coefficients quadratiques
+    double A = (dx * dx) / (a * a) + (dy * dy) / (b * b) - (dz * dz) / (c * c);
+    double B = 2 * ((ox * dx) / (a * a) + (oy * dy) / (b * b) - (oz * dz) / (c * c));
+    double C = (ox * ox) / (a * a) + (oy * oy) / (b * b) - (oz * oz) / (c * c) - 1;
+
+    // Résolution de l'équation quadratique A * t^2 + B * t + C = 0
+    double discriminant = B * B - 4 * A * C;
+    if (discriminant < 0)
+        return false; // Pas d'intersection
+
+    // Calcul des racines
+    double sqrt_discriminant = sqrt(discriminant);
+    double t0 = (-B - sqrt_discriminant) / (2 * A);
+    double t1 = (-B + sqrt_discriminant) / (2 * A);
+
+    // Trouver le plus proche point d'intersection valide
+    if (t0 > EPSILON && (t0 < t1 || t1 < EPSILON))
+        *t = t0;
+    else if (t1 > EPSILON)
+        *t = t1;
+    else
+        return false; // Les deux points sont derrière la caméra
+
+    // Vérification de la hauteur de l'intersection
+    t_vec hit_point = vector_add(ray_origin, scale_vec(ray_dir, *t));
+    double distance_along_axis = scalar_dot(vector_sub(hit_point, hyperboloid->base), hyperboloid->axis);
+
+    if (fabs(distance_along_axis) > c)
+        return false; // Intersection en dehors des limites de hauteur de l'hyperboloïde
+
+    return true;
+}
+
 
 
 

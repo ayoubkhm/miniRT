@@ -26,4 +26,7 @@ int key_press(int keycode, t_scene *scene);
 int key_release(int keycode, t_scene *scene);
 void update_camera_position(t_scene *scene);
 
+void    print_position_or_vect(t_vec vec, char *name);
+
+
 #endif

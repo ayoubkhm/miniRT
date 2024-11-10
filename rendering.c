@@ -63,22 +63,27 @@ t_color apply_checkerboard(t_vec point, t_color color1, t_color color2)
     int z_check = (int)(floor(point.z / CHECKER_SIZE)) % 2;
     
     if ((x_check + y_check + z_check) % 2 == 0)
-    {
         return color1;
-    }
     else
-    {
         return color2;
-    }
 }
 
 void render_scene(t_scene *scene)
 {
-    int i, j;
+    int i = 0, j = 0;
+    t_vec ray_dir;
+    t_color color; // Blanc par défaut
+    t_vec   n = (t_vec){0, 0, 0};
+    t_vec   l = (t_vec){0, 0, 0};
+    double t_min;
+    double t;
+    t_object *object;
+    bool hit;
+
 
     // Affiche la position de la caméra avant chaque rendu
-    printf("Camera position: {x: %.2f, y: %.2f, z: %.2f}\n",
-           scene->camera.position.x, scene->camera.position.y, scene->camera.position.z);
+    // printf("Camera position: {x: %.2f, y: %.2f, z: %.2f}\n",
+        //    scene->camera.position.x, scene->camera.position.y, scene->camera.position.z);
 
     if (!scene->mlx || !scene->win || !scene->image || !scene->image_data)
     {
@@ -86,20 +91,22 @@ void render_scene(t_scene *scene)
         return;
     }
 
-    for (j = 0; j < HEIGHT; j++)
+
+    while (j < HEIGHT)
     {
-        for (i = 0; i < WIDTH; i++)
+        i = 0;
+        while (i < WIDTH)
         {
-            t_vec ray_dir = compute_ray(i, j, scene->camera);
-            t_color color = {255, 255, 255}; // Blanc par défaut
-            double t_min = INFINITY;
+            ray_dir = compute_ray(i, j, scene->camera);
+            color = (t_color){255, 255, 255}; // Blanc par défaut
+            t_min = INFINITY;
 
             t_list *current = scene->objects;
             while (current)
             {
-                t_object *object = (t_object *)current->content;
-                double t = INFINITY;
-                bool hit = false;
+                object = (t_object *)current->content;
+                t = INFINITY;
+                hit = false;
                 double u = 0, v = 0;
 
                 // Intersection en fonction du type d'objet
@@ -114,21 +121,27 @@ void render_scene(t_scene *scene)
                     }
                 }
                 else if (object->type == CYLINDER)
-                {
                     hit = intersect_cylinder(scene->camera.position, ray_dir, *(t_cylinder *)object->data, &t);
-                }
                 else if (object->type == SPHERE)
                 {
                     hit = intersect_sphere(scene->camera.position, ray_dir, *(t_sphere *)object->data, &t);
                     if (hit)
                     {
                         t_sphere *sphere = (t_sphere *)object->data;
+                        n = vector_sub(scale_vec(scene->camera.position, t), sphere->center);
+                        // n = scale_vec(sphere->center, t);
+                        t_light light = *(t_light *)(scene->lights->content);
+                        l = vector_sub(light.position, n);
+                        n  = vector_normalize(n);
+                        l = vector_normalize(l);
                         t_vec hit_point = vector_add(scene->camera.position, scale_vec(ray_dir, t));
                         t_vec hit_dir = vector_normalize(vector_sub(hit_point, sphere->center));
                         u = 0.5 + atan2(hit_dir.z, hit_dir.x) / (2 * M_PI);
                         v = 0.5 - asin(hit_dir.y) / M_PI;
                     }
                 }
+                else if (object->type == HYPERBOLOID)
+                    hit = intersect_hyperboloid(scene->camera.position, ray_dir, (t_hyperboloid *)object->data, &t);
 
                 // Détermination de la couleur en fonction de la texture ou du damier
                 if (hit && t < t_min && t > 0)
@@ -156,7 +169,15 @@ void render_scene(t_scene *scene)
                     }
                     else
                     {
-                        color = object->color;
+                        if (object->type == SPHERE)
+                        {
+                            print_position_or_vect(l, "Direction avec la lumiere");
+                            print_position_or_vect(n, "Normal avec la sphere");
+                            color = (t_color){object->color.r * fmax(scalar_dot(n, l), 0), object->color.g * fmax(scalar_dot(n, l), 0), object->color.b * fmax(scalar_dot(n, l), 0)};
+                        }
+                        else
+                            color = object->color;
+
                     }
                 }
                 current = current->next;
@@ -170,10 +191,12 @@ void render_scene(t_scene *scene)
                 scene->image_data[offset + 1] = color.g;
                 scene->image_data[offset + 2] = color.r;
             }
+            i++;
         }
+        j++;
     }
 
     mlx_put_image_to_window(scene->mlx, scene->win, scene->image, 0, 0);
-    printf("Render completed.\n");
+    // printf("Render completed.\n");
 }
 

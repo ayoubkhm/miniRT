@@ -25,8 +25,8 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
     MLX_FLAGS = -L$(MLX_DIR) -lmlx -lXext -lX11 -lbsd
 else ifeq ($(UNAME_S),Darwin)
-    MLX_FLAGS = -L/usr/local/lib -lmlx -framework OpenGL -framework AppKit
-#      MLX_FLAGS = -L /usr/X11/lib -l mlx -framework OpenGL -framework AppKit
+#     MLX_FLAGS = -L/usr/local/lib -lmlx -framework OpenGL -framework AppKit
+     MLX_FLAGS = -L /usr/X11/lib -l mlx -framework OpenGL -framework AppKit
 endif
 
 # Fichiers sources

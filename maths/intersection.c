@@ -148,7 +148,7 @@ bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere sphere, double *
 
     if (discriminant < 0)
         return 0;
-    *t = fmin((-b - sqrt(discriminant)) / (2.0 * a), (-b + sqrt(discriminant)) / (2.0 * a));
+    *t = fmax(fmin((-b - sqrt(discriminant)) / (2.0 * a), (-b + sqrt(discriminant)) / (2.0 * a)), 0);
     return (*t > 0);
 }
 

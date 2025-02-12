@@ -30,6 +30,11 @@ typedef struct s_vec {
         double z;
 }       t_vec ;
 
+typedef struct s_list {
+    void *content;
+    struct s_list *next;
+} t_list;
+
 int		ft_atoi(const char *str);
 long	ft_atol(char *str);
 double  ft_atof(const char *str);
@@ -72,6 +77,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
 char	*ft_strndup(const char *s, size_t n);
+// int		ft_lstsize(t_list *lst);
 
 
 int		ft_printf(const char *__format, ...);

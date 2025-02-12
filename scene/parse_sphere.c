@@ -1,93 +1,73 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_sphere.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
+/*   Updated: 2025/02/12 14:20:33 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 
-int parse_sphere(t_scene *scene, char **tokens)
+static void	check_sphere_texture(char *texture_path, t_sphere *sphere)
 {
-    t_sphere    *sphere;
-    char *texture_path;
+	int	fd;
 
-    texture_path = NULL;
-
-    if (!tokens[1] || !tokens[2] || !tokens[3])
-    {
-        fprintf(stderr, "Error: Invalid sphere definition\n");
-        return (0);
-    }
-
-    sphere = malloc(sizeof(t_sphere));
-    if (!sphere)
-        return (0);
-
-    sphere->center = parse_vector(tokens[1]);
-    sphere->radius = ft_atof(tokens[2]) / 2.0;
-    sphere->color = parse_color(tokens[3]);
-    if (tokens[4] && tokens[4][0] != '#')
-    {
-        printf("Checking texture path: %s\n", tokens[4]);
-
-        char *extension = ft_strrchr(tokens[4], '.');
-        if (extension && ft_strcmp(extension, ".xpm") == 0)
-        {
-            texture_path = tokens[4];
-            int fd = open(texture_path, O_RDONLY);
-            if (fd == -1) {
-                fprintf(stderr, "Error: Texture file '%s' not found.\n", texture_path);
-                free(sphere);
-                exit(EXIT_FAILURE);
-            }
-            close(fd);
-        }
-        else
-        {
-            fprintf(stderr, "Error: Invalid file extension '%s' (only .xpm supported)\n", extension);
-            free(sphere);
-            exit(EXIT_FAILURE);
-        }
-    }
-    else if (tokens[4] && tokens[4][0] == '#')
-    {
-        //printf("No texture path provided or it's a comment. Continuing without texture.\n");
-    }
-
-    add_sphere(scene, sphere, texture_path);
-    return (1);
+	fd = open(texture_path, O_RDONLY);
+	if (fd == -1)
+	{
+		fprintf(stderr, "Error: Texture file '%s' not found.\n", texture_path);
+		free(sphere);
+		exit(EXIT_FAILURE);
+	}
+	close(fd);
 }
 
-void add_sphere(t_scene *scene, t_sphere *sphere, char *texture_path)
+static char	*get_sphere_texture(char **tokens, t_sphere *sphere)
 {
-    t_list *new_node;
-    t_object *object;
+	char	*texture_path;
+	char	*extension;
 
-    new_node = malloc(sizeof(t_list));
-    object = malloc(sizeof(t_object));    
-    if (!new_node || !object)
-    {
-        free(sphere);
-        return;
-    }
+	texture_path = NULL;
+	if (tokens[4] && tokens[4][0] != '#')
+	{
+		extension = ft_strrchr(tokens[4], '.');
+		if (extension && ft_strcmp(extension, ".xpm") == 0)
+		{
+			texture_path = tokens[4];
+			check_sphere_texture(texture_path, sphere);
+		}
+		else
+		{
+			fprintf(stderr, "Error: Invalid file extension '%s'\n",
+				extension);
+			free(sphere);
+			exit(EXIT_FAILURE);
+		}
+	}
+	return (texture_path);
+}
 
-    object->type = SPHERE;
-    object->data = sphere;
-    object->color = sphere->color;
+int	parse_sphere(t_scene *scene, char **tokens)
+{
+	t_sphere	*sphere;
+	char		*texture_path;
 
-    if (texture_path) 
-    {
-        object->texture = mlx_xpm_file_to_image(scene->mlx, texture_path, &object->tex_width, &object->tex_height);
-        if (!object->texture) {
-            fprintf(stderr, "Error\n");
-            free(object);
-            free(sphere);
-            free(new_node);
-            exit(EXIT_FAILURE);
-        }
-        object->texture_data = mlx_get_data_addr(object->texture, &object->bpp, &object->line_len, &object->endian);
-    }
-    else
-    {
-        object->texture = NULL;
-        object->texture_data = NULL;
-    }
-
-    new_node->content = object;
-    new_node->next = scene->objects;
-    scene->objects = new_node;
+	if (!tokens[1] || !tokens[2] || !tokens[3])
+	{
+		fprintf(stderr, "Error: Invalid sphere definition\n");
+		return (0);
+	}
+	sphere = malloc(sizeof(t_sphere));
+	if (!sphere)
+		return (0);
+	sphere->center = parse_vector(tokens[1]);
+	sphere->radius = ft_atof(tokens[2]) / 2.0;
+	sphere->color = parse_color(tokens[3]);
+	texture_path = get_sphere_texture(tokens, sphere);
+	add_sphere(scene, sphere, texture_path);
+	return (1);
 }

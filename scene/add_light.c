@@ -23,5 +23,6 @@ void	add_light(t_scene *scene, t_light *light)
 	}
 	new_node->content = light;
 	new_node->next = scene->lights;
+	scene->light_count++;
 	scene->lights = new_node;
 }

@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 23:57:21 by akhamass          #+#    #+#             */
-/*   Updated: 2024/11/09 23:57:40 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:46:11 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,17 @@ void	free_lights(t_list *lights)
 		free(current);
 		current = next;
 	}
+}
+
+void	free_tokens(char **tokens)
+{
+	int	i;
+
+	i = 0;
+	while (tokens[i])
+	{
+		free(tokens[i]);
+		i++;
+	}
+	free(tokens);
 }

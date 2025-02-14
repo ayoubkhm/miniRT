@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/12 15:07:56 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 08:29:14 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,5 +50,13 @@ char	*get_texture_path(char **tokens, t_cylinder *cylinder);
 void	handle_texture_error(t_cylinder *cylinder, char *msg, char *str);
 void	assign_texture(t_scene *scene, t_object *obj,
 			char *texture_path, t_cylinder *cylinder);
+int parse_hyperboloid(t_scene *scene, char **tokens);
+void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid,
+	char *texture_path);
+int parse_paraboloid(t_scene *scene, char **tokens);
+void add_paraboloid(t_scene *scene, t_paraboloid *paraboloid, char *texture_path);
+void	add_cone(t_scene *scene, t_cone *cone, char *texture_path);
+int	parse_cone(t_scene *scene, char **tokens);
+
 
 #endif

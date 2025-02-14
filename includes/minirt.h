@@ -13,9 +13,9 @@
 # include "../scene/objects.h"
 # include "../scene/scene.h"
 #include "../includes/mini_maths.h"
-#define MOVE_SPEED 2.0
+#define MOVE_SPEED 10.0
 #define ROTATE_SPEED 0.5
-#define MAX_DEPTH 1
+#define MAX_DEPTH 5
 
 
 t_vec   rotate_vec(t_vec vec, t_vec axis, double angle);
@@ -40,5 +40,8 @@ double compute_diffuse_single(t_scene *scene, t_hit hit, t_light *light);
 double compute_specular_single(t_scene *scene, t_hit hit, t_ray ray, t_light *light);
 void put_pixel(char *data, int x, int y, t_color color, int size_line);
 void    render_scene(t_scene *scene);
+int update_render_if_idle(t_scene *scene);
+t_color get_texture_color(t_object *obj, t_vec uv);
+
 
 #endif

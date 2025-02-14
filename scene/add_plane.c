@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/12 14:12:53 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:19:53 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	assign_plane_texture(t_scene *scene, t_object *obj,
 			&obj->tex_width, &obj->tex_height);
 	if (!obj->texture)
 	{
-		fprintf(stderr, "Error loading texture file: %s\n", texture_path);
+		printf("Error loading texture file: %s\n", texture_path);
 		free(obj);
 		free(plane);
 		exit(EXIT_FAILURE);
@@ -64,6 +64,7 @@ void	add_plane(t_scene *scene, t_plane *plane, char *texture_path)
 		return ;
 	}
 	object = create_plane_object(scene, plane, texture_path);
+	object->is_checkerboard = plane->is_checkerboard;
 	if (!object)
 	{
 		free(new_node);

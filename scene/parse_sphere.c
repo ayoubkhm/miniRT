@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/12 14:20:33 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:20:58 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,41 @@ static char	*get_sphere_texture(char **tokens, t_sphere *sphere)
 	return (texture_path);
 }
 
+static t_sphere	*init_sphere_fields(char **tokens)
+{
+	t_sphere	*sphere;
+
+	sphere = malloc(sizeof(t_sphere));
+	if (!sphere)
+		return (NULL);
+	sphere->center = parse_vector(tokens[1]);
+	sphere->radius = ft_atof(tokens[2]) / 2.0;
+	sphere->color = parse_color(tokens[3]);
+	sphere->is_checkerboard = false;
+	return (sphere);
+}
+
+static char	*get_sphere_texture_info(char **tokens, t_sphere *sphere)
+{
+	char	*texture_path;
+
+	if (tokens[4])
+	{
+		if (ft_strcmp(tokens[4], "checkerboard") == 0)
+		{
+			sphere->is_checkerboard = true;
+			texture_path = NULL;
+		}
+		else
+		{
+			texture_path = get_sphere_texture(tokens, sphere);
+		}
+	}
+	else
+		texture_path = NULL;
+	return (texture_path);
+}
+
 int	parse_sphere(t_scene *scene, char **tokens)
 {
 	t_sphere	*sphere;
@@ -58,16 +93,13 @@ int	parse_sphere(t_scene *scene, char **tokens)
 
 	if (!tokens[1] || !tokens[2] || !tokens[3])
 	{
-		fprintf(stderr, "Error: Invalid sphere definition\n");
+		printf("Error: Invalid sphere definition\n");
 		return (0);
 	}
-	sphere = malloc(sizeof(t_sphere));
+	sphere = init_sphere_fields(tokens);
 	if (!sphere)
 		return (0);
-	sphere->center = parse_vector(tokens[1]);
-	sphere->radius = ft_atof(tokens[2]) / 2.0;
-	sphere->color = parse_color(tokens[3]);
-	texture_path = get_sphere_texture(tokens, sphere);
+	texture_path = get_sphere_texture_info(tokens, sphere);
 	add_sphere(scene, sphere, texture_path);
 	return (1);
 }

@@ -1,0 +1,95 @@
+{
+   mlx_int_new_image
+   Memcheck:Leak
+   fun:mlx_int_new_image
+}
+
+{
+   XInitExtension
+   Memcheck:Leak
+   fun:XInitExtension
+}
+
+{
+   XOpenDisplay
+   Memcheck:Leak
+   fun:XOpenDisplay
+}
+
+{
+   XextAddDisplay
+   Memcheck:Leak
+   fun:XextAddDisplay
+}
+
+{
+   mlx_int_deal_shm
+   Memcheck:Leak
+   fun:mlx_int_deal_shm
+}
+
+{
+   _XEnq
+   Memcheck:Leak
+   fun:_XEnq
+}
+
+{
+   _XReply
+   Memcheck:Leak
+   fun:_XReply
+}
+
+{
+   _XUpdateAtomCache
+   Memcheck:Leak
+   fun:_XUpdateAtomCache
+}
+
+{
+   xcb_connect_to_fd
+   Memcheck:Leak
+   fun:xcb_connect_to_fd
+}
+
+{
+   xcb_connect_to_display_with_auth_info
+   Memcheck:Leak
+   fun:xcb_connect_to_display_with_auth_info
+}
+
+{
+   _XConnectXCB
+   Memcheck:Leak
+   fun:_XConnectXCB
+}
+
+{
+   XShmQueryVersion
+   Memcheck:Leak
+   fun:XShmQueryVersion
+}
+
+{
+   XkbGetMap
+   Memcheck:Leak
+   fun:XkbGetMap
+}
+
+{
+   XkbGetUpdatedMap
+   Memcheck:Leak
+   fun:XkbGetUpdatedMap
+}
+
+{
+   XkbKeycodeToKeysym
+   Memcheck:Leak
+   fun:XkbKeycodeToKeysym
+}
+
+{
+   XInternAtom
+   Memcheck:Leak
+   fun:XInternAtom
+}

@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   add_cylinder.c                                     :+:      :+:    :+:   */
+/*   add_hyperboloid.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 16:19:22 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:19:31 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minirt.h"
 
-void	assign_texture(t_scene *scene, t_object *obj,
-		char *texture_path, t_cylinder *cylinder)
+void assign_hyperboloid_texture(t_scene *scene, t_object *obj,
+		char *texture_path, t_hyperboloid *hyperboloid)
 {
 	if (texture_path)
 	{
@@ -21,9 +21,9 @@ void	assign_texture(t_scene *scene, t_object *obj,
 				&obj->tex_width, &obj->tex_height);
 		if (!obj->texture)
 		{
-			printf("Error\n");
+			printf("Error loading texture file: %s\n", texture_path);
 			free(obj);
-			free(cylinder);
+			free(hyperboloid);
 			exit(EXIT_FAILURE);
 		}
 		obj->texture_data = mlx_get_data_addr(obj->texture, &obj->bpp,
@@ -36,37 +36,38 @@ void	assign_texture(t_scene *scene, t_object *obj,
 	}
 }
 
-static t_object	*create_cylinder_object(t_scene *scene,
-	t_cylinder *cylinder, char *texture_path)
+static t_object *create_hyperboloid_object(t_scene *scene, t_hyperboloid *hyperboloid, char *texture_path)
 {
-	t_object	*obj;
+	t_object *obj;
 
 	obj = malloc(sizeof(t_object));
 	if (!obj)
 	{
-		free(cylinder);
+		free(hyperboloid);
 		return (NULL);
 	}
-	obj->type = CYLINDER;
-	obj->data = cylinder;
-	obj->color = cylinder->color;
-	obj->is_checkerboard = cylinder->is_checkerboard;
-	assign_texture(scene, obj, texture_path, cylinder);
+	obj->type = HYPERBOLOID;
+	obj->data = hyperboloid;
+	obj->color = hyperboloid->color;
+    // Propagation du flag checkerboard
+    obj->is_checkerboard = hyperboloid->is_checkerboard;
+	assign_hyperboloid_texture(scene, obj, texture_path, hyperboloid);
 	return (obj);
 }
 
-void	add_cylinder(t_scene *scene, t_cylinder *cylinder, char *texture_path)
+void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid,
+		char *texture_path)
 {
-	t_list		*new_node;
-	t_object	*object;
+	t_list *new_node;
+	t_object *object;
 
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 	{
-		free(cylinder);
-		return ;
+		free(hyperboloid);
+		return;
 	}
-	object = create_cylinder_object(scene, cylinder, texture_path);
+	object = create_hyperboloid_object(scene, hyperboloid, texture_path);
 	if (!object)
 	{
 		free(new_node);

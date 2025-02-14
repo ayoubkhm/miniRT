@@ -11,7 +11,8 @@ L 10,10,10 0.6 255,255,255
 L -10,10,10 0.6 255,255,255
 
 # Objet 1 - Sphere : Centre en (0,0,0) avec un diamètre de 10 (donc rayon = 5) et couleur rouge
-sp 0,0,0 10 255,0,0
+#sp 0,0,0 10 255,0,0
+co 0,-10,0 0,1,0 10 8 255,0,0
 
 # Objet 2 - Plan : Un sol horizontal passant par (0,-10,0) avec une normale vers le haut (0,1,0) et couleur verte
 pl 0,-10,0 0,1,0 0,255,0

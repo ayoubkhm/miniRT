@@ -1,0 +1,20 @@
+# Minimal scene file : un plan noir et un cercle au centre de la caméra
+
+# Ambiant (ratio 0.2, couleur blanche)
+A 0.4 255,255,255
+
+# Caméra positionnée à (0,0,-5) regardant vers +z avec un FOV de 60°
+C 0,0,-5 0,0,1 60
+
+# Lumière ponctuelle pour éclairer la scène (optionnelle)
+L 0,10,-10 1 255,255,255
+
+# Objet : plan horizontal noir
+# Format : pl <point> <normal> <color> [texture]
+pl 0,-10,0 0,1,0 0,0,0
+pl 0,20,0 0,1,0 0,0,0
+
+# Objet : sphère blanche centrée dans la vue
+# Format : sp <center> <diameter> <color>
+# Ici, une sphère de diamètre 4 (donc de rayon 2) placée sur l'axe z à 10 unités
+sp 0,0,10 10 255,255,255 example_scenes/textures/earth.xpm

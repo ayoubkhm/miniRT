@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/12 14:24:57 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:20:01 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static t_object	*assign_sphere_tex(t_scene *scene, t_object *obj,
 			&obj->tex_width, &obj->tex_height);
 	if (!obj->texture)
 	{
-		fprintf(stderr, "Error\n");
+		printf("Error\n");
 		free(obj);
 		free(sphere);
 		return (NULL);
@@ -29,8 +29,8 @@ static t_object	*assign_sphere_tex(t_scene *scene, t_object *obj,
 	return (obj);
 }
 
-static t_object	*create_sphere_object(t_scene *scene, t_sphere *sphere,
-	char *texture_path)
+static t_object	*create_sphere_object(t_scene *scene,
+	t_sphere *sphere, char *texture_path)
 {
 	t_object	*obj;
 
@@ -43,6 +43,7 @@ static t_object	*create_sphere_object(t_scene *scene, t_sphere *sphere,
 	obj->type = SPHERE;
 	obj->data = sphere;
 	obj->color = sphere->color;
+	obj->is_checkerboard = sphere->is_checkerboard;
 	if (texture_path)
 	{
 		if (!assign_sphere_tex(scene, obj, sphere, texture_path))

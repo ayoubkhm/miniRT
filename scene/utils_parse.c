@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/12 14:26:45 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:21:29 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ t_vec	parse_vector(char *str)
 	components = ft_split(str, ',');
 	if (!components[0] || !components[1] || !components[2])
 	{
-		fprintf(stderr, "Error: Invalid vector format\n");
+		printf("Error: Invalid vector format\n");
 	}
 	vec.x = ft_atof(components[0]);
 	vec.y = ft_atof(components[1]);
@@ -37,7 +37,7 @@ t_color	parse_color(char *str)
 	components = ft_split(str, ',');
 	if (!components[0] || !components[1] || !components[2])
 	{
-		fprintf(stderr, "Error: Invalid color format\n");
+		printf("Error: Invalid color format\n");
 	}
 	color.r = ft_atoi(components[0]);
 	color.g = ft_atoi(components[1]);
@@ -45,7 +45,7 @@ t_color	parse_color(char *str)
 	if (color.r < 0 || color.r > 255 || color.g < 0 || color.g > 255 || \
 		color.b < 0 || color.b > 255)
 	{
-		fprintf(stderr, "Error: Color value out of range\n");
+		printf("Error: Color value out of range\n");
 	}
 	free_tokens(components);
 	return (color);

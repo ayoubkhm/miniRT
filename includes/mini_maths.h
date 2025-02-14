@@ -25,6 +25,10 @@ bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere *sphere, t_hit *
 double choose_sphere_intersection(double t0, double t1);
 void fill_sphere_hit_record(t_vec ray_origin, t_vec ray_dir, t_sphere *sphere, double t_val, t_hit *hit);
 
+bool intersect_hyperboloid(t_vec ray_origin, t_vec ray_dir, t_hyperboloid *hyperboloid, t_hit *hit);
+bool intersect_paraboloid(t_vec ray_origin, t_vec ray_dir, t_paraboloid *paraboloid, t_hit *hit);
+bool intersect_cone(t_vec ray_origin, t_vec ray_dir, t_cone *cone, t_hit *hit);
+
 
 t_vec vector_sub(t_vec a, t_vec b);
 t_vec vector_normalize(t_vec v);

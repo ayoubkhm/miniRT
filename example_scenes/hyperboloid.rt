@@ -1,0 +1,32 @@
+# Exemple de scène miniRT – Pool Room avec hyperboloïde
+
+# Ambiance : éclairage ambiant léger
+A 0.3 200,200,200
+
+# Caméra : positionnée en (0,5,20), regardant vers le centre (0,0,0) avec un FOV de 60°
+C 0,5,20 0,-0.3,-1 60
+
+# Lumières : deux sources lumineuses pour éclairer la scène
+L 0,10,10 0.7 255,255,255
+L 10,8,0 0.5 255,255,200
+
+# Sol : plan horizontal à y=0, couleur verte (pour évoquer le tapis de billard par exemple)
+pl 0,-10,0 0,1,0 0,128,0
+
+# Plafond : plan horizontal à y=10, couleur blanche
+pl 0,10,0 0,-1,0 240,240,240
+
+# Mur arrière : plan vertical à z=-15, couleur grise
+pl 0,0,-15 0,0,1 150,150,150
+
+# Mur gauche : plan vertical à x=-15, couleur brun clair
+pl -15,0,0 1,0,0 180,150,120
+
+# Mur droit : plan vertical à x=15, couleur brun clair
+pl 15,0,0 -1,0,0 180,150,120
+
+# Hyperboloïde au centre : 
+# Format : hy <base> <axe> <diamètre> <hauteur> <couleur>
+# Ici, la base est (0,0,0), l’axe vertical (0,1,0), un diamètre de 2 (donc rayon = 1),
+# et une hauteur de 8 pour favoriser un centre plus épais et des côtés relativement étroits.
+hy 0,0,0 0,1,0 3 8 255,215,0

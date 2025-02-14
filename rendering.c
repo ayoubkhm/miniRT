@@ -65,41 +65,46 @@ t_vec compute_ray(int i, int j, t_scene *scene)
 */
 void *render_thread(void *arg)
 {
-    t_thread_data *data = (t_thread_data *)arg;
-    t_scene *scene = data->scene;
-    int offset;
+    t_thread_data *data;
+    t_scene       *scene;
+    int           offset;
+    int           j;
+    int           i;
+    float         pixel_camera_y;
+    float         pixel_camera_x;
+    t_vec         ray_dir;
+    t_color       color;
 
-    for (int j = data->start_y; j < data->end_y; j++)
+    data = (t_thread_data *)arg;
+    scene = data->scene;
+    j = data->start_y;
+    while (j < data->end_y)
     {
-        float pixel_camera_y = (scene->viewport_height / 2.0f) - (j + 0.5f) * scene->pixel_size_y;
-        for (int i = 0; i < WIDTH; i++)
+        pixel_camera_y = (scene->viewport_height / 2.0f) - ((j + 0.5f) * scene->pixel_size_y);
+        i = 0;
+        while (i < WIDTH)
         {
-            float pixel_camera_x = (-scene->viewport_width / 2.0f) + (i + 0.5f) * scene->pixel_size_x;
-            t_vec ray_dir = vector_normalize(vector_add(
-                vector_add(
-                    scale_vec(scene->camera_right, pixel_camera_x),
-                    scale_vec(scene->camera_up, pixel_camera_y)
-                ),
-                scene->camera_direction
-            ));
+            pixel_camera_x = (-scene->viewport_width / 2.0f) + ((i + 0.5f) * scene->pixel_size_x);
+            ray_dir = vector_normalize(vector_add(
+                        vector_add(
+                            scale_vec(scene->camera_right, pixel_camera_x),
+                            scale_vec(scene->camera_up, pixel_camera_y)
+                        ),
+                        scene->camera_direction));
             (void)ray_dir;
-            // Ici, insérez votre code de traçage de rayon pour déterminer la couleur du pixel.
-            // Par défaut, on met une couleur blanche.
-            t_color color = {255, 255, 255};
-
-            offset = (j * scene->line_len + i * (scene->bpp / 8));
+            color.r = 255;
+            color.g = 255;
+            color.b = 255;
+            offset = (j * scene->line_len) + (i * (scene->bpp / 8));
             if (offset >= 0 && offset + 3 < HEIGHT * scene->line_len)
             {
                 scene->image_data[offset] = color.b;
                 scene->image_data[offset + 1] = color.g;
                 scene->image_data[offset + 2] = color.r;
             }
+            i++;
         }
+        j++;
     }
     pthread_exit(NULL);
 }
-
-/*
-** render_scene
-** Divise le rendu entre plusieurs threads et affiche l'image.
-*/

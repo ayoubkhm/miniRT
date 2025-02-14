@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   add_cylinder.c                                     :+:      :+:    :+:   */
+/*   add_paraboloid.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 16:19:22 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/14 16:19:44 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minirt.h"
 
-void	assign_texture(t_scene *scene, t_object *obj,
-		char *texture_path, t_cylinder *cylinder)
+void	assign_paraboloid_texture(t_scene *scene, t_object *obj,
+	char *texture_path, t_paraboloid *paraboloid)
 {
 	if (texture_path)
 	{
@@ -21,9 +21,9 @@ void	assign_texture(t_scene *scene, t_object *obj,
 				&obj->tex_width, &obj->tex_height);
 		if (!obj->texture)
 		{
-			printf("Error\n");
+			printf("Error loading texture file: %s\n", texture_path);
 			free(obj);
-			free(cylinder);
+			free(paraboloid);
 			exit(EXIT_FAILURE);
 		}
 		obj->texture_data = mlx_get_data_addr(obj->texture, &obj->bpp,
@@ -36,26 +36,27 @@ void	assign_texture(t_scene *scene, t_object *obj,
 	}
 }
 
-static t_object	*create_cylinder_object(t_scene *scene,
-	t_cylinder *cylinder, char *texture_path)
+static t_object	*create_paraboloid_object(t_scene *scene,
+	t_paraboloid *paraboloid, char *texture_path)
 {
 	t_object	*obj;
 
 	obj = malloc(sizeof(t_object));
 	if (!obj)
 	{
-		free(cylinder);
+		free(paraboloid);
 		return (NULL);
 	}
-	obj->type = CYLINDER;
-	obj->data = cylinder;
-	obj->color = cylinder->color;
-	obj->is_checkerboard = cylinder->is_checkerboard;
-	assign_texture(scene, obj, texture_path, cylinder);
+	obj->type = PARABOLOID;
+	obj->data = paraboloid;
+	obj->color = paraboloid->color;
+	obj->is_checkerboard = paraboloid->is_checkerboard;
+	assign_paraboloid_texture(scene, obj, texture_path, paraboloid);
 	return (obj);
 }
 
-void	add_cylinder(t_scene *scene, t_cylinder *cylinder, char *texture_path)
+void	add_paraboloid(t_scene *scene,
+	t_paraboloid *paraboloid, char *texture_path)
 {
 	t_list		*new_node;
 	t_object	*object;
@@ -63,10 +64,10 @@ void	add_cylinder(t_scene *scene, t_cylinder *cylinder, char *texture_path)
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 	{
-		free(cylinder);
+		free(paraboloid);
 		return ;
 	}
-	object = create_cylinder_object(scene, cylinder, texture_path);
+	object = create_paraboloid_object(scene, paraboloid, texture_path);
 	if (!object)
 	{
 		free(new_node);

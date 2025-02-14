@@ -35,11 +35,18 @@ SRC =	./maths/intersection.c \
 	./maths/vector_op2.c \
 	./process.c \
 	./main.c \
+	./texture_mapping.c \
 	./mlx_utils.c \
 	./rendering.c \
 	./light_effects.c \
 	./scene/parse_sphere.c \
 	./scene/add_sphere.c \
+	./scene/parse_hyperboloid.c \
+	./scene/add_hyperboloid.c \
+	./scene/parse_paraboloid.c \
+	./scene/add_paraboloid.c \
+	./scene/parse_cone.c \
+	./scene/add_cone.c \
 	./scene/scene.c \
 	./scene/parse_plane.c \
 	./scene/add_plane.c \

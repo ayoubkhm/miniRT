@@ -43,7 +43,6 @@ void compute_plane_uv(t_plane *plane, t_hit *hit)
     hit->uv = (t_vec){u, v, 0};
 }
 
-// Fonction principale d'intersection pour le plan
 bool intersect_plane(t_vec ray_origin, t_vec ray_dir, t_plane *plane, t_hit *hit)
 {
     double t_val;
@@ -66,6 +65,13 @@ bool intersect_object(t_ray ray, t_object *object, t_hit *hit)
         is_hit = intersect_plane(ray.origin, ray.direction, (t_plane *)object->data, hit);
     else if (object->type == CYLINDER)
         is_hit = intersect_cylinder(ray.origin, ray.direction, (t_cylinder *)object->data, hit);
+    else if (object->type == HYPERBOLOID)
+        is_hit = intersect_hyperboloid(ray.origin, ray.direction, (t_hyperboloid *)object->data, hit);
+    else if (object->type == PARABOLOID)
+        is_hit = intersect_paraboloid(ray.origin, ray.direction, (t_paraboloid *)object->data, hit);
+    else if (object->type == CONE)
+        is_hit = intersect_cone(ray.origin, ray.direction, (t_cone *)object->data, hit);    
+
     if (is_hit)
         hit->object = object;
     return is_hit;

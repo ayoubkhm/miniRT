@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 13:29:05 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/27 19:42:13 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,7 @@ typedef struct s_scene
 	t_vec accumulated_translation;
 	double accumulated_rotation_y;
 	double accumulated_rotation_x; 
+	bool simple_render_mode;
 }	t_scene;
 
 #endif

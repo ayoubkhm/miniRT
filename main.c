@@ -3,35 +3,6 @@
 #include "../includes/minirt.h"
 #include <math.h>
 
-// int trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
-// {
-//     int found = 0;
-//     int i;
-//     double closest_t = DBL_MAX;
-//     t_hit temp_hit;
-//     t_list *obj = scene->objects;
-//     t_object *object;
-    
-//     i = 0;
-//     while (i < scene->object_count)
-//     {
-//         ft_memset(&temp_hit, 0, sizeof(t_hit));
-//         object = (t_object *)obj->content;
-//         if (intersect_object(ray, object, &temp_hit))
-//         {
-//             if (temp_hit.t < closest_t && temp_hit.t > EPSILON)
-//             {
-//                 closest_t = temp_hit.t;
-//                 *hit = temp_hit;
-//                 found = 1;
-//             }
-//         }
-//         obj = obj->next;
-//         i++;
-//     }
-//     return found;
-// }
-
 int trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
 {
     int found = 0;

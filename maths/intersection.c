@@ -4,7 +4,7 @@
 #include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-#define EPSILON 1e-6
+// #define EPSILON 1e-6
 
 bool compute_plane_intersection(t_vec ray_origin, t_vec ray_dir, t_plane *plane, double *t_val)
 {

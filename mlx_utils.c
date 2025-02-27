@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 17:14:03 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/02/27 20:08:53 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,82 +204,125 @@ int key_press(int keycode, t_scene *scene)
 
 int key_release(int keycode, t_scene *scene)
 {
-	double delta = get_current_time() - scene->last_key_press_time;
-	printf("Key released: %d\n", keycode);
-	printf("Elapsed time since key press: %f sec (movement offset: %f)\n",
-		   delta, MOVE_SPEED * delta);
+    double delta = get_current_time() - scene->last_key_press_time;
+    printf("Key released: %d\n", keycode);
+    printf("Elapsed time since key press: %f sec (movement offset: %f)\n",
+           delta, MOVE_SPEED * delta);
 
-	if (keycode == 13 || keycode == 119)
+    if (keycode == 13 || keycode == 119)
+    {
+        scene->move_forward = false;
+        scene->accumulated_translation = vector_add(
+            scene->accumulated_translation,
+            scale_vec(scene->camera.ray.direction, MOVE_SPEED * delta));
+    }
+    else if (keycode == 1 || keycode == 115)
+    {
+        scene->move_backward = false;
+        scene->accumulated_translation = vector_sub(
+            scene->accumulated_translation,
+            scale_vec(scene->camera.ray.direction, MOVE_SPEED * delta));
+    }
+    else if (keycode == 0 || keycode == 97)
+    {
+        scene->move_right = false;
+        {
+            t_vec right = vector_normalize(
+                vector_cross(scene->camera.ray.direction, (t_vec){0, 1, 0}));
+            scene->accumulated_translation = vector_add(
+                scene->accumulated_translation,
+                scale_vec(right, MOVE_SPEED * delta));
+        }
+    }
+    else if (keycode == 2 || keycode == 100)
+    {
+        scene->move_left = false;
+        {
+            t_vec left = vector_normalize(
+                vector_cross((t_vec){0, 1, 0}, scene->camera.ray.direction));
+            scene->accumulated_translation = vector_add(
+                scene->accumulated_translation,
+                scale_vec(left, MOVE_SPEED * delta));
+        }
+    }
+    else if (keycode == 114)
+    {
+        scene->move_up = false;
+        scene->accumulated_translation = vector_add(
+            scene->accumulated_translation, (t_vec){0, MOVE_SPEED * delta, 0});
+    }
+    else if (keycode == 102)
+    {
+        scene->move_down = false;
+        scene->accumulated_translation = vector_sub(
+            scene->accumulated_translation, (t_vec){0, MOVE_SPEED * delta, 0});
+    }
+    else if (keycode == 65361)
+    {
+        scene->rotate_left = false;
+        scene->accumulated_rotation_y -= ROTATE_SPEED * delta;
+    }
+    else if (keycode == 65363)
+    {
+        scene->rotate_right = false;
+        scene->accumulated_rotation_y += ROTATE_SPEED * delta;
+    }
+    else if (keycode == 65362)
+    {
+        scene->rotate_up = false;
+        scene->accumulated_rotation_x -= ROTATE_SPEED * delta;
+    }
+    else if (keycode == 65364)
+    {
+        scene->rotate_down = false;
+        scene->accumulated_rotation_x += ROTATE_SPEED * delta;
+    }
+    // Gestion de la touche O (code 111) : ajouter une sphère devant la caméra
+	else if (keycode == 111)
 	{
-		scene->move_forward = false;
-		scene->accumulated_translation = vector_add(
-			scene->accumulated_translation,
-			scale_vec(scene->camera.ray.direction, MOVE_SPEED * delta));
-	}
-	else if (keycode == 1 || keycode == 115)
-	{
-		scene->move_backward = false;
-		scene->accumulated_translation = vector_sub(
-			scene->accumulated_translation,
-			scale_vec(scene->camera.ray.direction, MOVE_SPEED * delta));
-	}
-	else if (keycode == 0 || keycode == 97)
-	{
-		scene->move_right = false;
+		// Définir une distance fixe pour placer la sphère devant la caméra
+		double distance = 5.0;
+		// Calculer la position de la sphère en avançant depuis l'origine de la caméra dans la direction du regard
+		t_vec sphere_center = vector_add(
+			scene->camera.ray.origin,
+			scale_vec(scene->camera.ray.direction, distance));
+		// Allouer et initialiser une nouvelle sphère
+		t_sphere *sphere = malloc(sizeof(t_sphere));
+		if (!sphere)
 		{
-			t_vec right = vector_normalize(
-				vector_cross(scene->camera.ray.direction, (t_vec){0, 1, 0}));
-			scene->accumulated_translation = vector_add(
-				scene->accumulated_translation,
-				scale_vec(right, MOVE_SPEED * delta));
+			printf("Erreur d'allocation pour la sphère.\n");
+			exit(EXIT_FAILURE);
+		}
+		sphere->center = sphere_center;
+		sphere->radius = 1.0;
+		sphere->color = (t_color){255, 0, 0};  // Exemple : sphère rouge
+		sphere->is_checkerboard = 0;           // Pas de damier par défaut
+	
+		// Ajouter la sphère à la scène (sans texture, d'où le NULL)
+		add_sphere(scene, sphere, NULL);
+		printf("Sphère ajoutée au centre de la caméra.\n");
+	}
+	
+    // Gestion de la touche Espace (code 32) : activer un mode de rendu simplifié (fictif)
+	else if (keycode == 32)
+	{
+		if (scene->simple_render_mode)
+		{
+			scene->simple_render_mode = false;
+			printf("Mode rendu simplifié désactivé.\n");
+		}
+		else
+		{
+			scene->simple_render_mode = true;
+			printf("Mode rendu simplifié activé.\n");
 		}
 	}
-	else if (keycode == 2 || keycode == 100)
-	{
-		scene->move_left = false;
-		{
-			t_vec left = vector_normalize(
-				vector_cross((t_vec){0, 1, 0}, scene->camera.ray.direction));
-			scene->accumulated_translation = vector_add(
-				scene->accumulated_translation,
-				scale_vec(left, MOVE_SPEED * delta));
-		}
-	}
-	else if (keycode == 114)
-	{
-		scene->move_up = false;
-		scene->accumulated_translation = vector_add(
-			scene->accumulated_translation, (t_vec){0, MOVE_SPEED * delta, 0});
-	}
-	else if (keycode == 102)
-	{
-		scene->move_down = false;
-		scene->accumulated_translation = vector_sub(
-			scene->accumulated_translation, (t_vec){0, MOVE_SPEED * delta, 0});
-	}
-	else if (keycode == 65361)
-	{
-		scene->rotate_left = false;
-		scene->accumulated_rotation_y -= ROTATE_SPEED * delta;
-	}
-	else if (keycode == 65363)
-	{
-		scene->rotate_right = false;
-		scene->accumulated_rotation_y += ROTATE_SPEED * delta;
-	}
-	else if (keycode == 65362)
-	{
-		scene->rotate_up = false;
-		scene->accumulated_rotation_x -= ROTATE_SPEED * delta;
-	}
-	else if (keycode == 65364)
-	{
-		scene->rotate_down = false;
-		scene->accumulated_rotation_x += ROTATE_SPEED * delta;
-	}
-	scene->last_key_release_time = get_current_time();
-	scene->rendering_pending = true;
-	if (!movement_keys_active(scene))
-		scene->key_active = false;
-	return (0);
+	
+    
+    scene->last_key_release_time = get_current_time();
+    scene->rendering_pending = true;
+    if (!movement_keys_active(scene))
+        scene->key_active = false;
+    return (0);
 }
+

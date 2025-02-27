@@ -4,7 +4,7 @@
 #include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-#define EPSILON 1e-4
+// #define EPSILON 1e-4
 
 // ---------------------------------------------------------------------------
 // Cylindre

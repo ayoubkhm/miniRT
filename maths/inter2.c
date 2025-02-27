@@ -4,7 +4,7 @@
 #include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-#define EPSILON 1e-6
+// #define EPSILON 1e-6
 
 bool solve_quadratic(double A, double B, double C, double *t0, double *t1)
 {

@@ -238,6 +238,46 @@ t_color trace_ray(t_scene *scene, t_ray ray, int depth)
 
 void process_by_pixel(t_scene *scene, int x, int y)
 {
+    if (scene->simple_render_mode)
+    {
+        // On calcule un rayon simple pour le centre du pixel (sans anti-aliasing ni jitter)
+        float pixel_ndc_x = ((float)x + 0.5f) / (float)WIDTH;
+        float pixel_ndc_y = ((float)y + 0.5f) / (float)HEIGHT;
+        float pixel_screen_x = 2.0f * pixel_ndc_x - 1.0f;
+        float pixel_screen_y = 1.0f - 2.0f * pixel_ndc_y;
+        t_vec ray_direction = vector_normalize(
+            vector_add(
+                vector_add(
+                    scale_vec(scene->camera_right, pixel_screen_x * scene->viewport_width / 2.0f),
+                    scale_vec(scene->camera_up, pixel_screen_y * scene->viewport_height / 2.0f)
+                ),
+                scene->camera_direction
+            )
+        );
+        t_ray ray;
+        ray.origin = scene->camera.ray.origin;
+        ray.direction = ray_direction;
+
+        t_hit hit;
+        t_color color;
+        if (trace_scene(scene, ray, &hit))
+        {
+            // Mode simple : on se contente de la couleur de base de l'objet, sans calculs d'éclairage
+            color = hit.object->color;
+        }
+        else
+        {
+            // Pas d'intersection : on utilise une couleur de fond simplifiée (gradient léger)
+            double t = 0.5 * (ray.direction.y + 1.0);
+            color.r = (int)((1.0 - t) * 255 + t * 128);
+            color.g = (int)((1.0 - t) * 255 + t * 178);
+            color.b = (int)((1.0 - t) * 255 + t * 255);
+        }
+        put_pixel(scene->image_data, x, y, color, scene->line_len);
+        return;
+    }
+    
+    // --- Mode complet (anti-aliasing et calculs lourds) ---
     t_color accum = {0, 0, 0};
     int s;
     int samples = AA_SAMPLES;
@@ -251,14 +291,12 @@ void process_by_pixel(t_scene *scene, int x, int y)
         jitter_x = ((float)rand() / (float)RAND_MAX) - 0.5f;
         jitter_y = ((float)rand() / (float)RAND_MAX) - 0.5f;
         ray.origin = scene->camera.ray.origin;
-        // Utilisation de compute_ray_aa avec le décalage
         ray.direction = compute_ray_aa((float)x + jitter_x, (float)y + jitter_y, scene);
         sample_color = trace_ray(scene, ray, MAX_DEPTH);
         accum.r += sample_color.r;
         accum.g += sample_color.g;
         accum.b += sample_color.b;
     }
-    // Moyenne des couleurs
     t_color color;
     color.r = accum.r / samples;
     color.g = accum.g / samples;

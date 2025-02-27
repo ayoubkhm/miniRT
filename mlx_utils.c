@@ -69,29 +69,46 @@ void close_window(t_scene *scene)
 	exit(0);
 }
 
+void draw_cross(char *image_data, int size, t_color color, int line_len)
+{
+    int x_center = WIDTH / 2;
+    int y_center = HEIGHT / 2;
+    int x;
+    int y;
+
+    x = x_center - size;
+    y = y_center - size;
+
+    // Dessiner la ligne horizontale
+    while (x <= x_center + size)
+        put_pixel(image_data, x++, y_center, color, line_len);
+
+    // Dessiner la ligne verticale
+    while (y <= y_center + size)
+        put_pixel(image_data, x_center, y++, color, line_len);
+}
+
 void render_scene(t_scene *scene)
 {
-	int x;
-	int y;
+    int x;
+    int y;
 
-	if (!scene->mlx || !scene->win || !scene->image || !scene->image_data)
-	{
-		printf("Error: mlx, window, or image not initialized.\n");
-		return;
-	}
-	y = 0;
-	while (y < HEIGHT)
-	{
-		x = 0;
-		while (x < WIDTH)
-		{
-			process_by_pixel(scene, x, y);
-			x++;
-		}
-		printf("\rRendering: %d%%", (100 * y) / HEIGHT);
-		y++;
-	}
-	mlx_put_image_to_window(scene->mlx, scene->win, scene->image, 0, 0);
+    if (!scene->mlx || !scene->win || !scene->image || !scene->image_data)
+    {
+        printf("Error: mlx, window, or image not initialized.\n");
+        return;
+    }
+    y = 0;
+    while (y < HEIGHT)
+    {
+        x = 0;
+        while (x < WIDTH)
+            process_by_pixel(scene, x++, y);
+        printf("\rRendering: %d%%", (100 * y) / HEIGHT);
+        y++;
+    }
+    draw_cross(scene->image_data, 10, (t_color){128, 128, 128}, scene->line_len);
+    mlx_put_image_to_window(scene->mlx, scene->win, scene->image, 0, 0);
 }
 
 int movement_keys_active(t_scene *scene)

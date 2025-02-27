@@ -17,6 +17,8 @@
 #define ROTATE_SPEED 0.5
 #define MAX_DEPTH 5
 
+#define EPSILON 1e-5
+
 
 t_vec   rotate_vec(t_vec vec, t_vec axis, double angle);
 t_color apply_checkerboard(t_vec point, t_color color1, t_color color2);

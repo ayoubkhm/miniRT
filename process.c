@@ -26,22 +26,26 @@ t_color combine_lighting(t_color base_color, double ambient, double diffuse, dou
     double base_g = base_color.g / 255.0;
     double base_b = base_color.b / 255.0;
 
+    // Limitation des valeurs pour éviter une saturation excessive
+    if (diffuse > 1.0) diffuse = 1.0;
+    if (specular > 1.0) specular = 1.0;
+    if (reflection > 1.0) reflection = 1.0;
+
     double local = ambient + diffuse;
-    if (local > 1.0)
-        local = 1.0;
-    
-    double extra = 0.5 * specular + 0.5 * reflection;
-    if (extra > 1.0)
-        extra = 1.0;
-    
-    double final_r = base_r * local + extra;
-    double final_g = base_g * local + extra;
-    double final_b = base_b * local + extra;
-    
-    if (final_r > 1.0) final_r = 1.0;
-    if (final_g > 1.0) final_g = 1.0;
-    if (final_b > 1.0) final_b = 1.0;
-    
+    if (local > 1.0) local = 1.0;
+
+    double extra = specular + reflection;
+    if (extra > 1.0) extra = 1.0;
+
+    double final_r = base_r * local + extra * 0.7; // Ajustement pour éviter la surexposition
+    double final_g = base_g * local + extra * 0.7;
+    double final_b = base_b * local + extra * 0.7;
+
+    // Clamping final
+    final_r = fmin(1.0, final_r);
+    final_g = fmin(1.0, final_g);
+    final_b = fmin(1.0, final_b);
+
     t_color final_color = {
         (int)(final_r * 255),
         (int)(final_g * 255),

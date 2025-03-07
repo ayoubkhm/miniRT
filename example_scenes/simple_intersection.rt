@@ -1,0 +1,17 @@
+# simple_intersection.rt
+
+# Ambiance : un éclairage ambiant léger
+A 0.2 255,255,255
+
+# Caméra : placée en (0,0,10), regardant vers (0,0,-1) avec un FOV de 60°
+C 0,0,10 0,0,-1 60
+
+# Lumière : une source lumineuse pour éclairer la scène
+L 0,10,10 0.6 255,255,255
+
+# Sphère : Centre (0,0,0), diamètre 4 (rayon = 2), couleur rouge
+sp 0,0,0 4 255,0,0
+
+# Cylindre : Base en (0,-2,0), direction (0,1,0), diamètre 2, hauteur 5, couleur verte
+# - Il devrait traverser la sphère et créer une zone d'intersection visible
+cy 0,-2,0 0,1,0 2 5 0,255,0

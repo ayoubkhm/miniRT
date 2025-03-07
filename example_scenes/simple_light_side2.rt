@@ -1,0 +1,17 @@
+# simple_light_translation.rt
+
+# Ambiance : un éclairage ambiant léger
+A 0.1 255,255,255
+
+# Caméra :
+#   Placée en (2,0,10), pointant vers la sphère en (2,0,0).
+#   Le vecteur direction = (2-2, 0-0, 0-10) = (0,0,-10) => normalisé en (0,0,-1)
+#   FOV de 60°
+C 2,0,10 0,0,-1 60
+
+# Lumière : placée légèrement sur la droite de la caméra
+#           pour un éclairage latéral
+L 7,0,10 0.6 255,255,255
+
+# Sphère : Centre translaté en (2,0,0), diamètre 4, couleur rouge
+sp 2,0,0 4 255,0,0

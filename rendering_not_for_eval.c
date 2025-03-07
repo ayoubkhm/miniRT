@@ -1,18 +1,22 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   rendering.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 00:27:53 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 00:27:57 by akhamass         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
+/* rendering.c */
 #include "includes/minirt.h"
 #include <math.h>
+#include <pthread.h>
 
+#define NUM_THREADS 4  // Nombre de threads
+
+// Structure pour passer les données à chaque thread
+typedef struct s_thread_data {
+    t_scene *scene;
+    int start_y;
+    int end_y;
+} t_thread_data;
+
+/*
+** rotate_vec
+** Tourne le vecteur 'v' autour de l'axe (normalisé) 'axis' d'un angle (en radians).
+** Utilise la formule de Rodrigues.
+*/
 t_vec rotate_vec(t_vec v, t_vec axis, double angle)
 {
     double cos_a = cos(angle);
@@ -23,6 +27,16 @@ t_vec rotate_vec(t_vec v, t_vec axis, double angle)
     return vector_normalize(vector_add(term1, vector_add(term2, term3)));
 }
 
+/*
+** compute_camera_parameters
+** Calcule et stocke dans 'scene' les paramètres nécessaires au rendu.
+*/
+
+
+/*
+** compute_ray
+** Calcule le rayon primaire pour le pixel (i, j) en utilisant les paramètres de la caméra.
+*/
 t_vec compute_ray(int i, int j, t_scene *scene)
 {
     float pixel_ndc_x = (i + 0.5f) / (float)WIDTH;
@@ -45,17 +59,26 @@ t_vec compute_ray(int i, int j, t_scene *scene)
     return ray_direction;
 }
 
-void render(t_scene *scene)
+/*
+** render_thread
+** Chaque thread rend une tranche de l'image.
+*/
+void *render_thread(void *arg)
 {
-    int j = 0;
-    int i;
-    int offset;
-    float pixel_camera_y;
-    float pixel_camera_x;
-    t_vec ray_dir;
-    t_color color;
+    t_thread_data *data;
+    t_scene       *scene;
+    int           offset;
+    int           j;
+    int           i;
+    float         pixel_camera_y;
+    float         pixel_camera_x;
+    t_vec         ray_dir;
+    t_color       color;
 
-    while (j < HEIGHT)
+    data = (t_thread_data *)arg;
+    scene = data->scene;
+    j = data->start_y;
+    while (j < data->end_y)
     {
         pixel_camera_y = (scene->viewport_height / 2.0f) - ((j + 0.5f) * scene->pixel_size_y);
         i = 0;
@@ -83,4 +106,5 @@ void render(t_scene *scene)
         }
         j++;
     }
+    pthread_exit(NULL);
 }

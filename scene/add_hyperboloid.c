@@ -6,13 +6,13 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 16:19:31 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 00:12:16 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minirt.h"
 
-void assign_hyperboloid_texture(t_scene *scene, t_object *obj,
+void	assign_hyperboloid_texture(t_scene *scene, t_object *obj,
 		char *texture_path, t_hyperboloid *hyperboloid)
 {
 	if (texture_path)
@@ -36,9 +36,10 @@ void assign_hyperboloid_texture(t_scene *scene, t_object *obj,
 	}
 }
 
-static t_object *create_hyperboloid_object(t_scene *scene, t_hyperboloid *hyperboloid, char *texture_path)
+static t_object	*create_hyperboloid_object(t_scene *scene,
+	t_hyperboloid *hyperboloid, char *texture_path)
 {
-	t_object *obj;
+	t_object	*obj;
 
 	obj = malloc(sizeof(t_object));
 	if (!obj)
@@ -49,23 +50,22 @@ static t_object *create_hyperboloid_object(t_scene *scene, t_hyperboloid *hyperb
 	obj->type = HYPERBOLOID;
 	obj->data = hyperboloid;
 	obj->color = hyperboloid->color;
-    // Propagation du flag checkerboard
-    obj->is_checkerboard = hyperboloid->is_checkerboard;
+	obj->is_checkerboard = hyperboloid->is_checkerboard;
 	assign_hyperboloid_texture(scene, obj, texture_path, hyperboloid);
 	return (obj);
 }
 
-void add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid,
+void	add_hyperboloid(t_scene *scene, t_hyperboloid *hyperboloid,
 		char *texture_path)
 {
-	t_list *new_node;
-	t_object *object;
+	t_list		*new_node;
+	t_object	*object;
 
 	new_node = malloc(sizeof(t_list));
 	if (!new_node)
 	{
 		free(hyperboloid);
-		return;
+		return ;
 	}
 	object = create_hyperboloid_object(scene, hyperboloid, texture_path);
 	if (!object)

@@ -1,0 +1,23 @@
+# simple_cam_x.rt
+
+# Ambiance : un éclairage ambiant léger
+A 0.2 255,255,255
+
+# Caméra : placée en (10,0,0), regardant vers l'origine (0,0,0)
+# FOV de 60°
+C 10,0,0 -1,0,0 60
+
+# Lumière : placée au-dessus, sur l'axe Z
+L 0,10,10 0.6 255,255,255
+
+# Objet 1 : Sphère au centre (0,0,0)
+# Diamètre 3, couleur rouge
+sp -30,0,0 3 255,0,0
+
+# Objet 2 : Plan horizontal (sol)
+# Passe par (0,-3,0), normale (0,1,0), couleur verte
+pl 0,-3,0 0,1,0 0,255,0
+
+# Objet 3 : Cylindre
+# Base en (2,-3,2), direction (0,1,0), diamètre 2, hauteur 5, couleur bleue
+cy -30,-3,2 0,1,0 2 5 0,0,255

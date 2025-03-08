@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 00:22:17 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 16:01:24 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,30 @@ typedef struct s_cone
 	bool	is_checkerboard;
 	t_color	color;
 }	t_cone;
+
+/* Structures supplémentaires pour les transformations et intersections */
+typedef struct s_trans
+{
+	t_vec	rot;
+	double	ang;
+}				t_trans;
+
+typedef struct s_parabint
+{
+	t_ray			r;
+	t_paraboloid	*parab;
+	double			p;
+	t_trans			tr;
+}				t_parabint;
+
+typedef struct s_hypint
+{
+	t_ray			local;
+	t_hyperboloid	*hyp;
+	double			a;
+	double			c;
+	t_trans			tr;
+}				t_hypint;
 
 typedef enum e_object_type
 {

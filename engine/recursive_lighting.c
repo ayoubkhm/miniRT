@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 04:31:30 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 04:31:31 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:54:44 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,23 @@ t_color	combine_recursive_lighting(t_color local_color, t_color reflect_color,
 			reflect_color, refract_color, params);
 	final_color = clamp_color(final_color);
 	return (final_color);
+}
+
+double	compute_diffuse_single(t_scene *scene, t_hit hit, t_light *light)
+{
+	t_vec	light_dir;
+	double	diff;
+
+	(void)scene;
+	light_dir = vector_normalize(vector_sub(light->position, hit.point));
+	diff = scalar_dot(hit.normal, light_dir);
+	if (diff < 0.1)
+	{
+		diff = 0;
+	}
+	else
+	{
+		diff = diff * light->ratio;
+	}
+	return (diff);
 }

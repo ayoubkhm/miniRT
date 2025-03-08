@@ -1,478 +1,546 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   inter3.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 18:03:23 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 18:25:50 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 #include "../includes/types.h"
 #include "../scene/objects.h"
 #include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-// #define EPSILON 1e-4
-
-// ---------------------------------------------------------------------------
-// Cylindre
-
-void fill_cylinder_hit_record(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, double t_val, int candidate_type, t_hit *hit, t_vec axis)
+static void	fill_cyl_hit(t_ray r, t_cylinder *c, t_intinfo *info, t_hit *h)
 {
-    double projection;
-    t_vec proj_point;
+	double	p;
+	t_vec	ax;
+	t_vec	pt;
 
-    hit->t = t_val;
-    hit->point = vector_add(ray_origin, scale_vec(ray_dir, t_val));
-    if (candidate_type == 0)
-    {
-        projection = scalar_dot(vector_sub(hit->point, cylinder->base), axis);
-        proj_point = vector_add(cylinder->base, scale_vec(axis, projection));
-        hit->normal = vector_normalize(vector_sub(hit->point, proj_point));
-    }
-    else if (candidate_type == 1)
-        hit->normal = vector_normalize(scale_vec(axis, -1));
-    else
-        hit->normal = vector_normalize(axis);
-    hit->material.color = cylinder->color;
-    // Initialisation des UV par défaut
-    hit->uv = (t_vec){0.0, 0.0, 0.0};
-    // Initialisation des autres propriétés du matériau
-    hit->material.reflectivity = 0.0;
-    hit->material.transparency = 0.0;
-    hit->material.refractive_index = 1.0;
+	h->t = info->t;
+	ax = vector_normalize(c->axis);
+	pt = vector_add(r.origin, scale_vec(r.direction, info->t));
+	h->point = pt;
+	if (info->cand == 0)
+	{
+		p = scalar_dot(vector_sub(pt, c->base), ax);
+		h->normal = vector_normalize(vector_sub(
+					pt, vector_add(c->base, scale_vec(ax, p))));
+	}
+	else if (info->cand == 1)
+		h->normal = vector_normalize(scale_vec(ax, -1));
+	else
+		h->normal = ax;
+	h->material.color = c->color;
+	h->uv = (t_vec){0, 0, 0};
+	h->material.reflectivity = 0;
+	h->material.transparency = 0;
+	h->material.refractive_index = 1;
 }
 
-bool intersect_cylinder(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, t_hit *hit)
+bool	intersect_cylinder(t_vec ro, t_vec rd, t_cylinder *c, t_hit *h)
 {
-    double *value;
-    int candidate;
-    t_vec axis;
-    t_vec top_center;
+	double		val[4];
+	t_vec		ax;
+	int			cand;
+	t_intinfo	info;
+	t_ray		ray;
 
-    value = (double *)malloc(sizeof(double) * 4);
-    if (!value)
-        return false;
-    axis = vector_normalize(cylinder->axis);
-    value[0] = cylinder_lateral_intersection(ray_origin, ray_dir, cylinder, axis);
-    value[1] = cylinder_cap_intersection(ray_origin, ray_dir, cylinder->base, cylinder->radius, axis);
-    top_center = vector_add(cylinder->base, scale_vec(axis, cylinder->height));
-    value[2] = cylinder_cap_intersection(ray_origin, ray_dir, top_center, cylinder->radius, axis);
-    candidate = choose_cylinder_candidate(value[0], value[1], value[2], &value[3]);
-    if (candidate < 0)
-    {
-        free(value);
-        return false;
-    }
-    fill_cylinder_hit_record(ray_origin, ray_dir, cylinder, value[3], candidate, hit, axis);
-    free(value);
-    return true;
+	ray = (t_ray){ro, rd};
+	ax = vector_normalize(c->axis);
+	val[0] = cylinder_lateral_intersection(ro, rd, c, ax);
+	val[1] = cylinder_cap_intersection(ray, c->base, c->radius, ax);
+	val[2] = cylinder_cap_intersection(ray, vector_add(
+				c->base, scale_vec(ax, c->height)), c->radius, ax);
+	cand = choose_cylinder_candidate(val[0], val[1], val[2], &val[3]);
+	if (cand < 0)
+	{
+		return (false);
+	}
+	info = (t_intinfo){val[3], cand};
+	fill_cyl_hit(ray, c, &info, h);
+	return (true);
 }
 
-// ---------------------------------------------------------------------------
-// Sphère
-
-double choose_sphere_intersection(double t0, double t1)
+static double	choose_sphere(double t0, double t1)
 {
-    if (t0 < t1)
-        return t0;
-    return t1;
+	double	valeurs[2];
+	double	min;
+	int		i;
+
+	valeurs[0] = t0;
+	valeurs[1] = t1;
+	min = valeurs[0];
+	i = 1;
+	while (i < 2)
+	{
+		if (valeurs[i] < min)
+		{
+			min = valeurs[i];
+		}
+		i++;
+	}
+	return (min);
 }
 
-void fill_sphere_hit_record(t_vec ray_origin, t_vec ray_dir, t_sphere *sphere, double t_val, t_hit *hit)
+static void	fill_sphere_hit(t_ray r, t_sphere *s, double t, t_hit *h)
 {
-    // Calcul du point d'intersection
-    hit->t = t_val;
-    hit->point = vector_add(ray_origin, scale_vec(ray_dir, t_val));
-    // Calcul de la normale : pour une sphère, c'est (point - center)
-    hit->normal = vector_normalize(vector_sub(hit->point, sphere->center));
-    hit->material.color = sphere->color;
+	t_vec	p;
+	t_vec	np;
+	double	phi;
+	double	theta;
 
-    // Calcul du mapping sphérique pour les UV
-    t_vec p = vector_normalize(vector_sub(hit->point, sphere->center));
-    double phi = atan2(-p.z, p.x) + M_PI;
-    double theta = acos(-p.y);
-    hit->uv.x = phi / (2.0 * M_PI);
-    hit->uv.y = 1.0 - (theta / M_PI);
-    hit->uv.z = 0.0;
-
-    // Initialisation des autres propriétés du matériau
-    hit->material.reflectivity = 0.0;
-    hit->material.transparency = 0.0;
-    hit->material.refractive_index = 1.0;
+	p = vector_add(r.origin, scale_vec(r.direction, t));
+	h->t = t;
+	h->point = p;
+	h->normal = vector_normalize(vector_sub(p, s->center));
+	np = vector_normalize(vector_sub(p, s->center));
+	phi = atan2(-np.z, np.x) + M_PI;
+	theta = acos(-np.y);
+	h->uv = (t_vec){phi / (2 * M_PI), 1 - theta / M_PI, 0};
+	h->material.color = s->color;
+	h->material.reflectivity = 0;
+	h->material.refractive_index = 1;
 }
 
-bool intersect_sphere(t_vec ray_origin, t_vec ray_dir, t_sphere *sphere, t_hit *hit)
+bool	intersect_sphere(t_vec ro, t_vec rd, t_sphere *s, t_hit *h)
 {
-    double t0;
-    double t1;
-    double t_val;
-    t_vec oc;
+	t_ray	r;
+	t_vec	oc;
+	t_quad	q;
+	double	ts[2];
+	double	t;
 
-    oc = vector_sub(ray_origin, sphere->center);
-    if (!solve_quadratic(scalar_dot(ray_dir, ray_dir),
-                         2.0 * scalar_dot(oc, ray_dir),
-                         scalar_dot(oc, oc) - (sphere->radius * sphere->radius),
-                         &t0, &t1))
-        return false;
-    t_val = choose_sphere_intersection(t0, t1);
-    if (t_val < EPSILON)
-        return false;
-    fill_sphere_hit_record(ray_origin, ray_dir, sphere, t_val, hit);
-    return true;
+	r = (t_ray){ro, rd};
+	oc = vector_sub(ro, s->center);
+	q.a = scalar_dot(r.direction, r.direction);
+	q.b = 2 * scalar_dot(oc, r.direction);
+	q.c = scalar_dot(oc, oc) - s->radius * s->radius;
+	if (!solve_quadratic(q, &ts[0], &ts[1]))
+		return (false);
+	t = choose_sphere(ts[0], ts[1]);
+	if (t < EPSILON)
+		return (false);
+	fill_sphere_hit(r, s, t, h);
+	return (true);
 }
 
-// ---------------------------------------------------------------------------
-// Hyperboloïde
-
-t_vec rodrigues_rotate(t_vec v, t_vec k, double angle)
+t_vec	rodrigues_rotate(t_vec v, t_vec k, double ang)
 {
-    double cos_a = cos(angle);
-    double sin_a = sin(angle);
-    t_vec term1 = scale_vec(v, cos_a);
-    t_vec term2 = scale_vec(vector_cross(k, v), sin_a);
-    t_vec term3 = scale_vec(k, scalar_dot(k, v) * (1 - cos_a));
-    return vector_add(vector_add(term1, term2), term3);
+	t_vec	t1;
+	t_vec	t2;
+	t_vec	t3;
+
+	t1 = scale_vec(v, cos(ang));
+	t2 = scale_vec(vector_cross(k, v), sin(ang));
+	t3 = scale_vec(k, scalar_dot(k, v) * (1 - cos(ang)));
+	return (vector_add(vector_add(t1, t2), t3));
 }
 
-// bool intersect_hyperboloid(t_vec ray_origin, t_vec ray_dir, t_hyperboloid *hyperboloid, t_hit *hit)
-// {
-//     t_vec local_origin;
-//     t_vec local_dir;
-//     t_vec k = vector_normalize(hyperboloid->axis);
-//     t_vec desired = {0, 0, 1};
-//     double dot_val = scalar_dot(k, desired);
-//     t_vec rotation_axis;
-//     double angle;
-
-//     if (fabs(dot_val - 1.0) < EPSILON)
-//     {
-//         local_origin = vector_sub(ray_origin, hyperboloid->base);
-//         local_dir = ray_dir;
-//         rotation_axis = (t_vec){0, 0, 0};
-//         angle = 0;
-//     }
-//     else if (fabs(dot_val + 1.0) < EPSILON)
-//     {
-//         rotation_axis = (t_vec){1, 0, 0};
-//         angle = M_PI;
-//         local_origin = rodrigues_rotate(vector_sub(ray_origin, hyperboloid->base), rotation_axis, angle);
-//         local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-//     }
-//     else
-//     {
-//         rotation_axis = vector_normalize(vector_cross(k, desired));
-//         angle = acos(dot_val);
-//         local_origin = rodrigues_rotate(vector_sub(ray_origin, hyperboloid->base), rotation_axis, angle);
-//         local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-//     }
-
-//     double a = hyperboloid->radius * hyperboloid->radius;
-//     double c = (hyperboloid->height / 2.0) * (hyperboloid->height / 2.0);
-//     double A = (local_dir.x * local_dir.x + local_dir.y * local_dir.y) / a - (local_dir.z * local_dir.z) / c;
-//     double B = 2.0 * ((local_origin.x * local_dir.x + local_origin.y * local_dir.y) / a - (local_origin.z * local_dir.z) / c);
-//     double C = (local_origin.x * local_origin.x + local_origin.y * local_origin.y) / a - (local_origin.z * local_dir.z) / c - 1.0;
-
-//     double discriminant = B * B - 4.0 * A * C;
-//     if (discriminant < 0)
-//         return false;
-//     double sqrt_disc = sqrt(discriminant);
-//     double t0 = (-B - sqrt_disc) / (2.0 * A);
-//     double t1 = (-B + sqrt_disc) / (2.0 * A);
-//     double t_val = (t0 > EPSILON) ? t0 : t1;
-//     if (t_val < EPSILON)
-//         return false;
-
-//     t_vec local_hit_point = vector_add(local_origin, scale_vec(local_dir, t_val));
-//     t_vec world_hit_point;
-//     if (angle != 0)
-//         world_hit_point = vector_add(hyperboloid->base, rodrigues_rotate(local_hit_point, rotation_axis, -angle));
-//     else
-//         world_hit_point = vector_add(hyperboloid->base, local_hit_point);
-
-//     hit->t = t_val;
-//     hit->point = world_hit_point;
-
-//     t_vec local_normal;
-//     local_normal.x = 2.0 * local_hit_point.x / a;
-//     local_normal.y = 2.0 * local_hit_point.y / a;
-//     local_normal.z = -2.0 * local_hit_point.z / c;
-//     local_normal = vector_normalize(local_normal);
-
-//     t_vec world_normal;
-//     if (angle != 0)
-//         world_normal = rodrigues_rotate(local_normal, rotation_axis, -angle);
-//     else
-//         world_normal = local_normal;
-//     hit->normal = vector_normalize(world_normal);
-//     hit->material.color = hyperboloid->color;
-//     // Initialisation des UV par défaut
-//     hit->uv = (t_vec){0.0, 0.0, 0.0};
-//     // Initialisation des propriétés du matériau
-//     hit->material.reflectivity = 0.0;
-//     hit->material.transparency = 0.0;
-//     hit->material.refractive_index = 1.0;
-//     return true;
-// }
-
-bool intersect_hyperboloid(t_vec ray_origin, t_vec ray_dir, t_hyperboloid *hyperboloid, t_hit *hit)
+static void	compute_hyp_transform_params(t_hyperboloid *h,
+		t_vec *rot, double *ang)
 {
-    t_vec local_origin, local_dir;
-    t_vec k = vector_normalize(hyperboloid->axis);
-    t_vec desired = {0, 0, 1}; // Axe cible
-    double dot_val = scalar_dot(k, desired);
-    t_vec rotation_axis;
-    double angle;
+	t_vec	k;
+	t_vec	d;
+	double	dot;
 
-    if (fabs(dot_val - 1.0) < EPSILON)
-    {
-        local_origin = vector_sub(ray_origin, hyperboloid->base);
-        local_dir = ray_dir;
-        rotation_axis = (t_vec){0, 0, 0};
-        angle = 0;
-    }
-    else if (fabs(dot_val + 1.0) < EPSILON)
-    {
-        rotation_axis = (t_vec){1, 0, 0};
-        angle = M_PI;
-        local_origin = rodrigues_rotate(vector_sub(ray_origin, hyperboloid->base), rotation_axis, angle);
-        local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-    }
-    else
-    {
-        rotation_axis = vector_normalize(vector_cross(k, desired));
-        angle = acos(dot_val);
-        local_origin = rodrigues_rotate(vector_sub(ray_origin, hyperboloid->base), rotation_axis, angle);
-        local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-    }
-
-    // ✅ Correction de la formule de l'hyperboloïde
-    double a = hyperboloid->radius * hyperboloid->radius;
-    double c = (hyperboloid->height / 2.0) * (hyperboloid->height / 2.0);
-
-    double A = (local_dir.x * local_dir.x + local_dir.y * local_dir.y) / a - (local_dir.z * local_dir.z) / c;
-    double B = 2.0 * ((local_origin.x * local_dir.x + local_origin.y * local_dir.y) / a - (local_origin.z * local_dir.z) / c);
-    double C = (local_origin.x * local_origin.x + local_origin.y * local_origin.y) / a - (local_origin.z * local_origin.z) / c - 1.0;
-
-    double discriminant = B * B - 4.0 * A * C;
-
-    // ✅ Vérification correcte du discriminant
-    if (discriminant < 0)
-        return false;
-
-    double sqrt_disc = sqrt(discriminant);
-    double t0 = (-B - sqrt_disc) / (2.0 * A);
-    double t1 = (-B + sqrt_disc) / (2.0 * A);
-
-    // ✅ Sélection correcte du plus petit `t` positif
-    double t_val = (t0 > EPSILON) ? t0 : ((t1 > EPSILON) ? t1 : -1);
-    if (t_val < EPSILON)
-        return false;
-
-    // ✅ Correction de la transformation du point d'intersection
-    t_vec local_hit_point = vector_add(local_origin, scale_vec(local_dir, t_val));
-    t_vec world_hit_point = (angle != 0) ?
-        vector_add(hyperboloid->base, rodrigues_rotate(local_hit_point, rotation_axis, -angle)) :
-        vector_add(hyperboloid->base, local_hit_point);
-
-    hit->t = t_val;
-    hit->point = world_hit_point;
-
-    // ✅ Correction du calcul de la normale
-    t_vec local_normal = {
-        2.0 * local_hit_point.x / a,
-        2.0 * local_hit_point.y / a,
-        -2.0 * local_hit_point.z / c
-    };
-    local_normal = vector_normalize(local_normal);
-
-    t_vec world_normal = (angle != 0) ? rodrigues_rotate(local_normal, rotation_axis, -angle) : local_normal;
-    hit->normal = vector_normalize(world_normal);
-
-    // ✅ Ajout de propriétés correctes pour le matériau
-    hit->material.color = hyperboloid->color;
-    hit->uv = (t_vec){0.0, 0.0, 0.0};
-    // hit->material.reflectivity = hyperboloid->reflectivity;
-    // hit->material.transparency = hyperboloid->transparency;
-    // hit->material.refractive_index = hyperboloid->refractive_index;
-
-    return true;
+	k = vector_normalize(h->axis);
+	d.x = 0;
+	d.y = 0;
+	d.z = 1;
+	dot = scalar_dot(k, d);
+	if (fabs(dot - 1) < EPSILON)
+	{
+		*rot = (t_vec){0, 0, 0};
+		*ang = 0;
+	}
+	else if (fabs(dot + 1) < EPSILON)
+	{
+		*rot = (t_vec){1, 0, 0};
+		*ang = M_PI;
+	}
+	else
+	{
+		*rot = vector_normalize(vector_cross(k, d));
+		*ang = acos(dot);
+	}
 }
 
-// ---------------------------------------------------------------------------
-// Paraboloïde
-
-bool intersect_paraboloid(t_vec ray_origin, t_vec ray_dir, t_paraboloid *paraboloid, t_hit *hit)
+static void	transform_hyp_ray(t_ray r, t_hyperboloid *h, t_ray *l, t_trans *tr)
 {
-    t_vec k = vector_normalize(paraboloid->axis);
-    t_vec desired = {0, 0, 1};
-    double dot_val = scalar_dot(k, desired);
-    t_vec rotation_axis;
-    double angle;
-    t_vec local_origin, local_dir;
+	t_vec	diff;
 
-    if (fabs(dot_val - 1.0) < EPSILON) {
-        local_origin = vector_sub(ray_origin, paraboloid->base);
-        local_dir = ray_dir;
-        angle = 0;
-    }
-    else if (fabs(dot_val + 1.0) < EPSILON) {
-        rotation_axis = (t_vec){1, 0, 0};
-        angle = M_PI;
-        local_origin = rodrigues_rotate(vector_sub(ray_origin, paraboloid->base), rotation_axis, angle);
-        local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-    }
-    else {
-        rotation_axis = vector_normalize(vector_cross(k, desired));
-        angle = acos(dot_val);
-        local_origin = rodrigues_rotate(vector_sub(ray_origin, paraboloid->base), rotation_axis, angle);
-        local_dir = rodrigues_rotate(ray_dir, rotation_axis, angle);
-    }
-    
-    double A = local_dir.x * local_dir.x + local_dir.y * local_dir.y;
-    double B = 2.0 * (local_origin.x * local_dir.x + local_origin.y * local_dir.y) - 2.0 * paraboloid->p * local_dir.z;
-    double C = local_origin.x * local_origin.x + local_origin.y * local_origin.y - 2.0 * paraboloid->p * local_origin.z;
-    
-    double discriminant = B * B - 4.0 * A * C;
-    if (discriminant < 0)
-        return false;
-    
-    double sqrt_disc = sqrt(discriminant);
-    double t0 = (-B - sqrt_disc) / (2.0 * A);
-    double t1 = (-B + sqrt_disc) / (2.0 * A);
-    double t_val = (t0 > EPSILON) ? t0 : t1;
-    if (t_val < EPSILON)
-        return false;
-    
-    t_vec local_hit_point = vector_add(local_origin, scale_vec(local_dir, t_val));
-    
-    t_vec world_hit_point;
-    if (angle != 0)
-        world_hit_point = vector_add(paraboloid->base, rodrigues_rotate(local_hit_point, rotation_axis, -angle));
-    else
-        world_hit_point = vector_add(paraboloid->base, local_hit_point);
-    
-    hit->t = t_val;
-    hit->point = world_hit_point;
-    
-    t_vec local_normal = {2.0 * local_hit_point.x,
-                          2.0 * local_hit_point.y,
-                          -2.0 * paraboloid->p};
-    local_normal = vector_normalize(local_normal);
-    
-    t_vec world_normal;
-    if (angle != 0)
-        world_normal = rodrigues_rotate(local_normal, rotation_axis, -angle);
-    else
-        world_normal = local_normal;
-    
-    hit->normal = vector_normalize(world_normal);
-    hit->material.color = paraboloid->color;
-    // Initialisation des UV par défaut
-    hit->uv = (t_vec){0.0, 0.0, 0.0};
-    // Initialisation des propriétés du matériau
-    hit->material.reflectivity = 0.0;
-    hit->material.transparency = 0.0;
-    hit->material.refractive_index = 1.0;
-    return true;
+	compute_hyp_transform_params(h, &tr->rot, &tr->ang);
+	diff = vector_sub(r.origin, h->base);
+	if (tr->ang == 0)
+	{
+		l->origin = diff;
+		l->direction = r.direction;
+	}
+	else
+	{
+		l->origin = rodrigues_rotate(diff, tr->rot, tr->ang);
+		l->direction = rodrigues_rotate(r.direction, tr->rot, tr->ang);
+	}
 }
 
-// ---------------------------------------------------------------------------
-// Cône
-
-bool intersect_cone(t_vec ray_origin, t_vec ray_dir, t_cone *cone, t_hit *hit)
+static t_quad	compute_hyp_coeffs(t_ray l, double a, double c)
 {
-    double t_lateral = INFINITY;
-    double t_base = INFINITY;
-    t_hit hit_lateral, hit_base;
-    bool hitLateral = false, hitBase = false;
-    double cos2 = cos(cone->angle) * cos(cone->angle);
-    t_vec v = vector_sub(ray_origin, cone->vertex);
-    
-    // Intersection latérale du cône
-    {
-        double A = scalar_dot(ray_dir, cone->axis) * scalar_dot(ray_dir, cone->axis)
-                   - cos2 * scalar_dot(ray_dir, ray_dir);
-        double B = 2.0 * (scalar_dot(ray_dir, cone->axis) * scalar_dot(v, cone->axis)
-                   - cos2 * scalar_dot(v, ray_dir));
-        double C = scalar_dot(v, cone->axis) * scalar_dot(v, cone->axis)
-                   - cos2 * scalar_dot(v, v);
-        double discriminant = B * B - 4.0 * A * C;
-        if (discriminant >= 0)
-        {
-            double sqrt_disc = sqrt(discriminant);
-            double t0 = (-B - sqrt_disc) / (2.0 * A);
-            double t1 = (-B + sqrt_disc) / (2.0 * A);
-            double t_candidate = (t0 > EPSILON) ? t0 : t1;
-            if (t_candidate > EPSILON)
-            {
-                t_vec P = vector_add(ray_origin, scale_vec(ray_dir, t_candidate));
-                t_vec P_minus_V = vector_sub(P, cone->vertex);
-                double t_proj = scalar_dot(P_minus_V, cone->axis);
-                if (t_proj >= 0 && t_proj <= cone->height)
-                {
-                    t_lateral = t_candidate;
-                    hit_lateral.t = t_candidate;
-                    hit_lateral.point = P;
-                    t_vec grad = vector_sub(scale_vec(cone->axis, 2.0 * scalar_dot(P_minus_V, cone->axis)),
-                                             scale_vec(P_minus_V, 2.0 * cos2));
-                    hit_lateral.normal = vector_normalize(grad);
-                    hit_lateral.material.color = cone->color;
-                    hitLateral = true;
-                }
-            }
-        }
-    }
-    
-    // Intersection avec la base du cône
-    {
-        t_vec base_center = vector_add(cone->vertex, scale_vec(cone->axis, cone->height));
-        double denom = scalar_dot(ray_dir, cone->axis);
-        if (fabs(denom) > EPSILON)
-        {
-            double t_candidate = scalar_dot(vector_sub(base_center, ray_origin), cone->axis) / denom;
-            if (t_candidate > EPSILON)
-            {
-                t_vec P = vector_add(ray_origin, scale_vec(ray_dir, t_candidate));
-                double base_radius = cone->height * tan(cone->angle);
-                double dist = vector_length(vector_sub(P, base_center));
-                if (dist <= base_radius)
-                {
-                    t_base = t_candidate;
-                    hit_base.t = t_candidate;
-                    hit_base.point = P;
-                    hit_base.normal = scale_vec(vector_normalize(cone->axis), -1);
-                    hit_base.material.color = cone->color;
-                    hitBase = true;
-                }
-            }
-        }
-    }
-    
-    // Choix de la solution la plus proche
-    if (hitLateral && hitBase)
-    {
-        if (t_lateral < t_base)
-            *hit = hit_lateral;
-        else
-            *hit = hit_base;
-        hit->uv = (t_vec){0.0, 0.0, 0.0};
-        // Initialisation des propriétés du matériau
-        hit->material.reflectivity = 0.0;
-        hit->material.transparency = 0.0;
-        hit->material.refractive_index = 1.0;
-        return true;
-    }
-    else if (hitLateral)
-    {
-        *hit = hit_lateral;
-        hit->uv = (t_vec){0.0, 0.0, 0.0};
-        hit->material.reflectivity = 0.0;
-        hit->material.transparency = 0.0;
-        hit->material.refractive_index = 1.0;
-        return true;
-    }
-    else if (hitBase)
-    {
-        *hit = hit_base;
-        hit->uv = (t_vec){0.0, 0.0, 0.0};
-        hit->material.reflectivity = 0.0;
-        hit->material.transparency = 0.0;
-        hit->material.refractive_index = 1.0;
-        return true;
-    }
-    
-    return false;
+	t_quad	co;
+
+	co.a = (l.direction.x * l.direction.x + l.direction.y * l.direction.y) / a
+		- (l.direction.z * l.direction.z) / c;
+	co.b = 2 * ((l.origin.x * l.direction.x + l.origin.y * l.direction.y) / a
+			- (l.origin.z * l.direction.z) / c);
+	co.c = (l.origin.x * l.origin.x + l.origin.y * l.origin.y) / a
+		- (l.origin.z * l.origin.z) / c - 1;
+	return (co);
+}
+
+static bool	solve_hyp_quad(double A, double B, double C, double *t)
+{
+	double	disc;
+	double	sd;
+	double	t0;
+	double	t1;
+
+	disc = B * B - 4 * A * C;
+	if (disc < 0)
+		return (false);
+	sd = sqrt(disc);
+	t0 = (-B - sd) / (2 * A);
+	t1 = (-B + sd) / (2 * A);
+	if (t0 > EPSILON)
+		*t = t0;
+	else
+	{
+		if (t1 > EPSILON)
+			*t = t1;
+		else
+			*t = -1;
+	}
+	if (*t >= EPSILON)
+		return (true);
+	else
+		return (false);
+}
+
+static t_vec	compute_hyp_hit_point(t_hypint *I, t_vec lp)
+{
+	t_vec	wp;
+
+	if (I->tr.ang != 0)
+		wp = vector_add(I->hyp->base, rodrigues_rotate(
+					lp, I->tr.rot, -I->tr.ang));
+	else
+		wp = vector_add(I->hyp->base, lp);
+	return (wp);
+}
+
+static t_vec	compute_hyp_hit_normal(t_hypint *I, t_vec lp)
+{
+	t_vec	ln;
+	t_vec	norm;
+
+	ln.x = 2 * lp.x / I->a;
+	ln.y = 2 * lp.y / I->a;
+	ln.z = -2 * lp.z / I->c;
+	ln = vector_normalize(ln);
+	if (I->tr.ang != 0)
+		norm = vector_normalize(rodrigues_rotate(ln, I->tr.rot, -I->tr.ang));
+	else
+		norm = vector_normalize(ln);
+	return (norm);
+}
+
+static void	set_hyp_hit(t_hypint *I, double t, t_hit *h)
+{
+	t_vec	lp;
+	t_vec	wp;
+	t_vec	norm;
+	t_vec	zero;
+
+	lp = vector_add(I->local.origin, scale_vec(I->local.direction, t));
+	wp = compute_hyp_hit_point(I, lp);
+	h->t = t;
+	h->point = wp;
+	norm = compute_hyp_hit_normal(I, lp);
+	h->normal = norm;
+	h->material.color = I->hyp->color;
+	zero.x = 0;
+	zero.y = 0;
+	zero.z = 0;
+	h->uv = zero;
+}
+
+bool	intersect_hyperboloid(t_vec ro, t_vec rd, t_hyperboloid *h, t_hit *hit)
+{
+	t_ray		lr;
+	t_trans		tr;
+	t_quad		co;
+	double		t;
+	t_hypint	info;
+
+	transform_hyp_ray((t_ray){ro, rd}, h, &lr, &tr);
+	co = compute_hyp_coeffs(lr, h->radius * h->radius,
+			(h->height / 2.0) * (h->height / 2.0));
+	if (!solve_hyp_quad(co.a, co.b, co.c, &t))
+		return (false);
+	info = (t_hypint){lr, h, h->radius * h->radius,
+		(h->height / 2.0) * (h->height / 2.0), tr};
+	set_hyp_hit(&info, t, hit);
+	return (true);
+}
+
+static void	compute_parab_transform_params(t_paraboloid *p,
+		t_vec *rot, double *ang)
+{
+	t_vec	k;
+	t_vec	d;
+	double	dot;
+
+	k = vector_normalize(p->axis);
+	d.x = 0;
+	d.y = 0;
+	d.z = 1;
+	dot = scalar_dot(k, d);
+	if (fabs(dot - 1) < EPSILON)
+	{
+		*rot = (t_vec){0, 0, 0};
+		*ang = 0;
+	}
+	else if (fabs(dot + 1) < EPSILON)
+	{
+		*rot = (t_vec){1, 0, 0};
+		*ang = M_PI;
+	}
+	else
+	{
+		*rot = vector_normalize(vector_cross(k, d));
+		*ang = acos(dot);
+	}
+}
+
+static void	transform_parab_ray(t_ray r, t_paraboloid *p, t_ray *l, t_trans *tr)
+{
+	t_vec	diff;
+
+	compute_parab_transform_params(p, &tr->rot, &tr->ang);
+	diff = vector_sub(r.origin, p->base);
+	if (tr->ang == 0)
+	{
+		l->origin = diff;
+		l->direction = r.direction;
+	}
+	else
+	{
+		l->origin = rodrigues_rotate(diff, tr->rot, tr->ang);
+		l->direction = rodrigues_rotate(r.direction, tr->rot, tr->ang);
+	}
+}
+
+static t_parabcoeff	compute_parab_coeff(t_ray l, double p)
+{
+	t_parabcoeff	cp;
+
+	cp.A = l.direction.x * l.direction.x + l.direction.y * l.direction.y;
+	cp.B = 2 * (l.origin.x * l.direction.x
+			+ l.origin.y * l.direction.y) - 2 * p * l.direction.z;
+	cp.C = l.origin.x * l.origin.x
+		+ l.origin.y * l.origin.y - 2 * p * l.origin.z;
+	return (cp);
+}
+
+static bool	solve_parab_quad(double A, double B, double C, double *t)
+{
+	double	disc;
+	double	sd;
+	double	t0;
+	double	t1;
+
+	disc = B * B - 4 * A * C;
+	if (disc < 0)
+		return (false);
+	sd = sqrt(disc);
+	t0 = (-B - sd) / (2 * A);
+	t1 = (-B + sd) / (2 * A);
+	if (t0 > EPSILON)
+		*t = t0;
+	else
+		*t = t1;
+	if (*t >= EPSILON)
+		return (true);
+	else
+		return (false);
+}
+
+static void	compute_parab_hit_geometry(t_parabint *I, double t,
+		t_vec *point, t_vec *normal)
+{
+	t_vec	lp;
+	t_vec	wp;
+	t_vec	ln;
+
+	lp = vector_add(I->r.origin, scale_vec(I->r.direction, t));
+	if (I->tr.ang != 0)
+		wp = vector_add(I->parab->base,
+				rodrigues_rotate(lp, I->tr.rot, -I->tr.ang));
+	else
+		wp = vector_add(I->parab->base, lp);
+	*point = wp;
+	ln.x = 2 * lp.x;
+	ln.y = 2 * lp.y;
+	ln.z = -2 * I->p;
+	ln = vector_normalize(ln);
+	if (I->tr.ang != 0)
+		*normal = vector_normalize(rodrigues_rotate(ln, I->tr.rot, -I->tr.ang));
+	else
+		*normal = vector_normalize(ln);
+}
+
+static void	set_parab_hit(t_parabint *I, double t, t_hit *h)
+{
+	t_vec	point;
+	t_vec	normal;
+	t_vec	zero;
+
+	compute_parab_hit_geometry(I, t, &point, &normal);
+	h->t = t;
+	h->point = point;
+	h->normal = normal;
+	h->material.color = I->parab->color;
+	zero.x = 0;
+	zero.y = 0;
+	zero.z = 0;
+	h->uv = zero;
+	h->material.reflectivity = 0;
+	h->material.transparency = 0;
+	h->material.refractive_index = 1;
+}
+
+bool	intersect_paraboloid(t_vec ro, t_vec rd, t_paraboloid *p, t_hit *hit)
+{
+	t_ray			lr;
+	t_trans			tr;
+	t_parabcoeff	cp;
+	double			t;
+	t_parabint		info;
+
+	transform_parab_ray((t_ray){ro, rd}, p, &lr, &tr);
+	cp = compute_parab_coeff(lr, p->p);
+	if (!solve_parab_quad(cp.A, cp.B, cp.C, &t))
+		return (false);
+	info = (t_parabint){lr, p, p->p, tr};
+	set_parab_hit(&info, t, hit);
+	return (true);
+}
+
+static bool	compute_cone_lat_t(t_ray r, t_cone *c, double *t)
+{
+	double	c2;
+	t_quad	q;
+	double	ts[2];
+
+	c2 = cos(c->angle) * cos(c->angle);
+	q.a = scalar_dot(r.direction, c->axis) * scalar_dot(r.direction, c->axis)
+		- c2 * scalar_dot(r.direction, r.direction);
+	q.b = 2 * (scalar_dot(r.direction, c->axis)
+			* scalar_dot(vector_sub(r.origin, c->vertex), c->axis)
+			- c2 * scalar_dot(vector_sub(r.origin, c->vertex), r.direction));
+	q.c = scalar_dot(vector_sub(r.origin, c->vertex), c->axis)
+		* scalar_dot(vector_sub(r.origin, c->vertex), c->axis)
+		- c2 * scalar_dot(vector_sub(r.origin, c->vertex),
+			vector_sub(r.origin, c->vertex));
+	if (!solve_quadratic(q, &ts[0], &ts[1]))
+		return (false);
+	if (ts[0] > EPSILON)
+		*t = ts[0];
+	else
+		*t = ts[1];
+	if (*t < EPSILON)
+		return (false);
+	return (true);
+}
+
+static bool	intersect_cone_lat(t_ray r, t_cone *c, t_hit *h)
+{
+	double	t;
+	t_vec	d;
+
+	if (!compute_cone_lat_t(r, c, &t))
+		return (false);
+	d = vector_sub(vector_add(r.origin, scale_vec(r.direction, t)), c->vertex);
+	if (scalar_dot(d, c->axis) < 0 || scalar_dot(d, c->axis) > c->height)
+		return (false);
+	h->t = t;
+	h->point = vector_add(r.origin, scale_vec(r.direction, t));
+	h->normal = vector_normalize(vector_sub(h->point, vector_add(c->vertex,
+					scale_vec(c->axis, scalar_dot(d, c->axis)))));
+	h->material.color = c->color;
+	return (true);
+}
+
+static bool	intersect_cone_base(t_ray r, t_cone *c, t_hit *h)
+{
+	t_vec	bc;
+	double	denom;
+	double	t;
+	t_vec	p;
+
+	bc = vector_add(c->vertex, scale_vec(c->axis, c->height));
+	denom = scalar_dot(r.direction, c->axis);
+	if (fabs(denom) < EPSILON)
+		return (false);
+	t = scalar_dot(vector_sub(bc, r.origin), c->axis) / denom;
+	if (t < EPSILON)
+		return (false);
+	p = vector_add(r.origin, scale_vec(r.direction, t));
+	if (vector_length(vector_sub(p, bc)) > c->height * tan(c->angle))
+		return (false);
+	h->t = t;
+	h->point = p;
+	h->normal = scale_vec(vector_normalize(c->axis), -1);
+	h->material.color = c->color;
+	return (true);
+}
+
+static void	init_hit(t_hit *h)
+{
+	h->uv = (t_vec){0, 0, 0};
+	h->material.reflectivity = 0;
+	h->material.transparency = 0;
+	h->material.refractive_index = 1;
+}
+
+bool	intersect_cone(t_vec ro, t_vec rd, t_cone *c, t_hit *h)
+{
+	t_ray	r;
+	t_hit	hl;
+	t_hit	hb;
+	bool	lat;
+	bool	bas;
+
+	r = (t_ray){ro, rd};
+	lat = intersect_cone_lat(r, c, &hl);
+	bas = intersect_cone_base(r, c, &hb);
+	if (!lat && !bas)
+		return (false);
+	if (lat && bas)
+	{
+		if (hl.t < hb.t)
+			*h = hl;
+		else
+			*h = hb;
+	}
+	else if (lat)
+		*h = hl;
+	else
+		*h = hb;
+	init_hit(h);
+	return (true);
 }

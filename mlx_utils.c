@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 04:56:32 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 14:21:26 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,9 @@ void	render_scene(t_scene *scene)
 	{
 		x = 0;
 		while (x < WIDTH)
+		{
 			process_by_pixel(scene, x++, y);
+		}
 		printf("\rRendering: %d%%", (100 * y) / HEIGHT);
 		y++;
 	}

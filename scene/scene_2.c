@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 05:30:29 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 14:00:07 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	process_scene_line(char *line, t_scene *scene)
 	}
 	if (!parse_line(scene, trimmed_line))
 	{
-		printf(stderr, "Error parsing line: %s\n", trimmed_line);
+		printf("Error parsing line: %s\n", trimmed_line);
 		free(trimmed_line);
 		return (0);
 	}

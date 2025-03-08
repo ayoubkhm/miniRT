@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 21:37:22 by akhamass          #+#    #+#             */
-/*   Updated: 2024/11/01 10:03:14 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 14:16:32 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,14 @@
 # include <limits.h>
 # include <stdbool.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE BUFSIZ
+# endif
 
+# if BUFFER_SIZE > 9223372036854775806
+#  undef BUFFER_SIZE
+#  define BUFFER_SIZE 0
+# endif
 
 typedef struct s_vec {
         double x;
@@ -77,7 +84,6 @@ char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
 char	*ft_strndup(const char *s, size_t n);
-// int		ft_lstsize(t_list *lst);
 
 
 int		ft_printf(const char *__format, ...);
@@ -86,8 +92,18 @@ int		prt_ptr(void *ptr_addr);
 int		prt_int(int n);
 int		prt_unsigned(unsigned int nbr);
 int		prt_hexa(unsigned int nbr, bool upper_case);
-int	        prt_vec(t_vec vec);
+int	    prt_vec(t_vec vec);
 
+
+char	*get_before_newline(const char *s);
+char	*get_after_newline(const char *s);
+void	ft_read_line(int fd, char **keep, char **tmp);
+char	*ft_parse_line(char **keep, char **tmp);
+char	*get_next_line(int fd);
+int	check_newline(const char *s);
+char	*joined_strs(const char *s1, const char *s2);
+void	*ft_calloc_bzero(size_t count, size_t size);
+void	ft_free_strs(char **str, char **str2, char **str3);
 
 
 #endif

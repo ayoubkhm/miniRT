@@ -1,79 +1,83 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 01:42:01 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 01:42:02 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 //main.c
 
 #include "../includes/minirt.h"
 #include <math.h>
 
-int trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
+static int	process_object(t_ray ray, t_object *object,
+	double *closest_t, t_hit *hit)
 {
-    int found = 0;
-    int i;
-    double closest_t = DBL_MAX;
-    t_hit temp_hit;
-    t_list *obj = scene->objects;
-    t_object *object;
-    
-    i = 0;
-    while (i < scene->object_count)
-    {
-        ft_memset(&temp_hit, 0, sizeof(t_hit));
-        object = (t_object *)obj->content;
-        if (intersect_object(ray, object, &temp_hit))
-        {
-            // Correction de l'auto-intersection
-            if (temp_hit.t < closest_t && temp_hit.t > (EPSILON * 10.0)) 
-            {
-                closest_t = temp_hit.t;
-                *hit = temp_hit;
-                found = 1;
-            }
-        }
-        obj = obj->next;
-        i++;
-    }
-    return found;
+	t_hit	temp;
+
+	ft_memset(&temp, 0, sizeof(t_hit));
+	if (intersect_object(ray, object, &temp))
+	{
+		if (temp.t < *closest_t && temp.t > (EPSILON * 10.0))
+		{
+			*closest_t = temp.t;
+			*hit = temp;
+			return (1);
+		}
+	}
+	return (0);
 }
 
-void put_pixel(char *data, int x, int y, t_color color, int size_line)
+int	trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
 {
-    int index;
+	int			found;
+	int			i;
+	double		closest_t;
+	t_list		*obj;
+	t_object	*object;
 
-    index = y * size_line + x * 4;
-    data[index] = color.b;
-    data[index + 1] = color.g;
-    data[index + 2] = color.r;
-    data[index + 3] = 0;
+	found = 0;
+	i = 0;
+	closest_t = DBL_MAX;
+	obj = scene->objects;
+	while (i < scene->object_count)
+	{
+		object = (t_object *)obj->content;
+		if (process_object(ray, object, &closest_t, hit))
+			found = 1;
+		obj = obj->next;
+		i++;
+	}
+	return (found);
 }
 
-
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
-    t_scene scene;
+	t_scene	scene;
 
-    if (ac != 2)
-    {
-        printf("Usage: %s <scene_file.rt>\n", av[0]);
-        return (EXIT_FAILURE);
-    }
-    init_scene(&scene);
-    scene.accumulated_translation = (t_vec){0, 0, 0};
-    scene.key_active = false;
-    scene.rendering_pending = false;
-    scene.last_key_press_time = 0;
-    scene.last_key_release_time = 0;
-
-    if (!load_scene(&scene, av[1]))
-    {
-        printf("Error.\n");
-        free_scene(&scene);
-        return (EXIT_FAILURE);
-    }
-    printf("Scene loaded successfully:\n");
-    compute_camera_parameters(&scene);
-    render_scene(&scene);
-    mlx_hook(scene.win, 2, 1L << 0, key_press, &scene);
-    mlx_hook(scene.win, 3, 1L << 1, key_release, &scene);
-    mlx_loop_hook(scene.mlx, update_render_if_idle, &scene);
-    mlx_loop(scene.mlx);
-    free_scene(&scene);
-    return (EXIT_SUCCESS);
+	if (ac != 2)
+	{
+		printf("Usage: %s <scene_file.rt>\n", av[0]);
+		return (EXIT_FAILURE);
+	}
+	init_scene(&scene);
+	scene.accumulated_translation = (t_vec){0, 0, 0};
+	if (!load_scene(&scene, av[1]))
+	{
+		printf("Error.\n");
+		free_scene(&scene);
+		return (EXIT_FAILURE);
+	}
+	printf("Scene loaded successfully:\n");
+	compute_camera_parameters(&scene);
+	render_scene(&scene);
+	mlx_hook(scene.win, 2, 1L << 0, key_press, &scene);
+	mlx_loop(scene.mlx);
+	free_scene(&scene);
+	return (EXIT_SUCCESS);
 }

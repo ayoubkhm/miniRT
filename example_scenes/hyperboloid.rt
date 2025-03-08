@@ -29,4 +29,4 @@ pl 15,0,0 -1,0,0 180,150,120
 # Format : hy <base> <axe> <diamètre> <hauteur> <couleur>
 # Ici, la base est (0,0,0), l’axe vertical (0,1,0), un diamètre de 2 (donc rayon = 1),
 # et une hauteur de 8 pour favoriser un centre plus épais et des côtés relativement étroits.
-hy 0,0,0 0,1,0 3 8 255,215,0
+hy 0,0,0 0,1,0 -3 8 255,215,0

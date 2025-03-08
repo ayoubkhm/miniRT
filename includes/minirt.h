@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 05:04:20 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 19:56:43 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 20:34:05 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,7 @@
 # define ROTATE_SPEED 0.5
 # define MAX_DEPTH 5
 # define EPSILON 1e-5
-#ifndef MAX_DOUBLE
 # define MAX_DOUBLE 1e308
-#endif
-
-
 
 t_color		apply_checkerboard(t_vec point, t_color color1, t_color color2);
 void		close_window(t_scene *scene);

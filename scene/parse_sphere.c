@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 05:30:52 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 13:58:35 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	check_sphere_texture(char *texture_path, t_sphere *sphere)
 	fd = open(texture_path, O_RDONLY);
 	if (fd == -1)
 	{
-		printf(stderr, "Error: Texture file '%s' not found.\n", texture_path);
+		printf("Error: Texture file '%s' not found.\n", texture_path);
 		free(sphere);
 		exit(EXIT_FAILURE);
 	}
@@ -42,7 +42,7 @@ static char	*get_sphere_texture(char **tokens, t_sphere *sphere)
 		}
 		else
 		{
-			printf(stderr, "Error: Invalid file extension '%s'\n",
+			printf("Error: Invalid file extension '%s'\n",
 				extension);
 			free(sphere);
 			exit(EXIT_FAILURE);

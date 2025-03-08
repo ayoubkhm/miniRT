@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   mlx_init.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/28 00:24:30 by W2Wizard          #+#    #+#             */
-/*   Updated: 2025/03/08 05:32:15 by akhamass         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "MLX42/MLX42_Int.h"
 
 //= Private =//
@@ -94,7 +82,7 @@ static uint32_t mlx_compile_shader(const char* code, int32_t type)
 	if (!success)
 	{
 		glGetShaderInfoLog(shader, sizeof(infolog), NULL, infolog);
-		printf(stderr, "%s", infolog);
+		fprintf(stderr, "%s", infolog);
 		return (0);
 	}
 	return (shader);

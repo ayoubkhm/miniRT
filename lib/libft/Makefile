@@ -46,6 +46,8 @@ SRCS =		ft_atoi.c\
 		prt_ptr.c\
 		prt_str.c\
 		prt_unsigned.c \
+		get_next_line.c\
+		get_next_line_utils.c\
 		ft_strndup.c \
 
 OBJS= $(SRCS:.c=.o)

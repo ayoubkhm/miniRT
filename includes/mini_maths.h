@@ -3,14 +3,19 @@
 
 # include "../includes/types.h"
 # include "../lib/libft/libft.h"
-# include "objects.h"
+# include "../scene/objects.h"
 # include <math.h>
-# include <float.h>
+# include <float.h>  // Pour DBL_MAX
 
-bool solve_quadratic(double A, double B, double C, double *t0, double *t1);
-bool valid_cylinder_candidate(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, t_vec axis, double t_candidate);
+// bool solve_quadratic(double A, double B, double C, double *t0, double *t1);
+bool solve_quadratic(t_quad q, double *t0, double *t1);
+// bool solve_quadratic(t_quad q, double *t_val);
+// double	fmin_positive(double a, double b);
+
+
+bool valid_cylinder_candidate(t_ray ray, t_cylinder *cylinder, t_vec axis, double t_candidate);
 double cylinder_lateral_intersection(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, t_vec axis);
-double cylinder_cap_intersection(t_vec ray_origin, t_vec ray_dir, t_vec cap_center, double radius, t_vec axis);
+double cylinder_cap_intersection(t_ray ray, t_vec cap_center, double radius, t_vec axis);
 int choose_cylinder_candidate(double t_lateral, double t_cap_bottom, double t_cap_top, double *t_val);
 void fill_cylinder_hit_record(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, double t_val, int candidate_type, t_hit *hit, t_vec axis);
 bool intersect_cylinder(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, t_hit *t);
@@ -40,5 +45,6 @@ t_vec vector_cross(t_vec a, t_vec b);
 
 double vector_length(t_vec v);
 void    ft_swap(double *a, double *b);
+
 
 #endif

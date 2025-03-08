@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 04:06:46 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 04:06:51 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:54:51 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,25 +77,6 @@ double	compute_shadow(t_scene *scene, t_hit hit, t_light *light)
 	}
 	intensity = 1.0 - ((double)hits / SHADOW_SAMPLES);
 	return (fmax(intensity, 0.2));
-}
-
-double	compute_diffuse_single(t_scene *scene, t_hit hit, t_light *light)
-{
-	t_vec	light_dir;
-	double	diff;
-
-	(void)scene;
-	light_dir = vector_normalize(vector_sub(light->position, hit.point));
-	diff = scalar_dot(hit.normal, light_dir);
-	if (diff < 0.1)
-	{
-		diff = 0;
-	}
-	else
-	{
-		diff = diff * light->ratio;
-	}
-	return (diff);
 }
 
 double	compute_specular_single(t_scene *scene, t_hit hit,

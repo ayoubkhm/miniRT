@@ -6,12 +6,14 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 05:30:02 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 15:52:59 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minirt.h"
 #include "../lib/libft/libft.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 void	init_scene(t_scene *scene)
 {
@@ -51,20 +53,28 @@ static int	read_scene_file(FILE *file, t_scene *scene)
 
 int	load_scene(t_scene *scene, const char *filename)
 {
-	FILE	*file;
+	int		fd;
 	int		status;
+	FILE	*file;
 
-	file = open(filename, "r");
-	if (!file)
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
 	{
 		perror("Error opening file");
 		return (0);
 	}
+	file = fdopen(fd, "r");
+	if (!file)
+	{
+		perror("Error: fdopen failed");
+		close(fd);
+		return (0);
+	}
 	status = read_scene_file(file, scene);
-	close(file);
+	close(fd);
 	if (!scene->camera_defined || !scene->ambient_light_defined)
 	{
-		printf(stderr, "Error: Camera or ambient light not defined\n");
+		printf("Error: Camera or ambient light not defined\n");
 		return (0);
 	}
 	return (status);

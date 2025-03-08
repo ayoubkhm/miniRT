@@ -33,11 +33,15 @@ SRC =	./maths/intersection.c \
 	./maths/inter3.c \
 	./maths/vector_op.c \
 	./maths/vector_op2.c \
-	./process.c \
+	./engine/color_utils.c \
+	./engine/material_utils.c \
+	./engine/ray_tracing.c \
+	./engine/recursive_lighting.c \
+	./engine/rendering.c \
+	./engine/vector_utils.c \
 	./main.c \
-	./texture_mapping.c \
+	./engine/texture_mapping.c \
 	./mlx_utils.c \
-	./rendering.c \
 	./light_effects.c \
 	./scene/parse_sphere.c \
 	./scene/add_sphere.c \

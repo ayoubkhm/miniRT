@@ -19,3 +19,5 @@ int	prt_str(char const *str)
 	else
 		return (write(1, str, ft_strlen(str)));
 }
+
+

@@ -1,37 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vector_op2.c                                       :+:      :+:    :+:   */
+/*   rotation.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 19:57:26 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 19:58:19 by akhamass         ###   ########.fr       */
+/*   Created: 2025/03/08 20:00:26 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 20:00:27 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/minirt.h"
+#include "../includes/types.h"
+#include "../scene/objects.h"
+#include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-t_vec	vector_cross(t_vec a, t_vec b)
+t_vec	rodrigues_rotate(t_vec v, t_vec k, double ang)
 {
-	t_vec	result;
+	t_vec	t1;
+	t_vec	t2;
+	t_vec	t3;
 
-	result.x = a.y * b.z - a.z * b.y;
-	result.y = a.z * b.x - a.x * b.z;
-	result.z = a.x * b.y - a.y * b.x;
-	return (result);
-}
-
-double	vector_length(t_vec v)
-{
-	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
-}
-
-void	ft_swap(double *a, double *b)
-{
-	double	tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
+	t1 = scale_vec(v, cos(ang));
+	t2 = scale_vec(vector_cross(k, v), sin(ang));
+	t3 = scale_vec(k, scalar_dot(k, v) * (1 - cos(ang)));
+	return (vector_add(vector_add(t1, t2), t3));
 }

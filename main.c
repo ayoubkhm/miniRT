@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 01:42:01 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 14:24:11 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 20:13:13 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
 
 	found = 0;
 	i = 0;
-	closest_t = DBL_MAX;
+	closest_t = MAX_DOUBLE;
 	obj = scene->objects;
 	while (i < scene->object_count)
 	{

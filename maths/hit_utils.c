@@ -1,37 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vector_op2.c                                       :+:      :+:    :+:   */
+/*   hit_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 19:57:26 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 19:58:19 by akhamass         ###   ########.fr       */
+/*   Created: 2025/03/08 19:00:30 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 19:00:30 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../includes/minirt.h"
+#include "../includes/types.h"
+#include "../scene/objects.h"
+#include "../scene/scene.h"
 #include "../includes/mini_maths.h"
 
-t_vec	vector_cross(t_vec a, t_vec b)
+void	init_hit(t_hit *h)
 {
-	t_vec	result;
-
-	result.x = a.y * b.z - a.z * b.y;
-	result.y = a.z * b.x - a.x * b.z;
-	result.z = a.x * b.y - a.y * b.x;
-	return (result);
-}
-
-double	vector_length(t_vec v)
-{
-	return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
-}
-
-void	ft_swap(double *a, double *b)
-{
-	double	tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
+	h->uv = (t_vec){0, 0, 0};
+	h->material.reflectivity = 0;
+	h->material.transparency = 0;
+	h->material.refractive_index = 1;
 }

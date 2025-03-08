@@ -29,8 +29,18 @@ endif
 
 # Fichiers sources
 SRC =	./maths/intersection.c \
-	./maths/inter2.c \
-	./maths/inter3.c \
+	./maths/cone_intersection.c \
+	./maths/cylinder_inter2.c \
+	./maths/hyperboloid_intersection.c \
+	./maths/hyperboloid_transform.c \
+	./maths/paraboloid_math.c \
+	./maths/quadratic.c \
+	./maths/sphere_intersection.c \
+	./maths/cylinder_inter.c \
+	./maths/hit_utils.c \
+	./maths/hyperboloid_math.c \
+	./maths/paraboloid_transform.c \
+	./maths/rotation.c \
 	./maths/vector_op.c \
 	./maths/vector_op2.c \
 	./engine/color_utils.c \

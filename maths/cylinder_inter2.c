@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   inter2.c                                           :+:      :+:    :+:   */
+/*   cylinder_inter2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/08 18:28:19 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 18:28:20 by akhamass         ###   ########.fr       */
+/*   Created: 2025/03/08 19:02:10 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 19:02:47 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,34 +15,6 @@
 #include "../scene/objects.h"
 #include "../scene/scene.h"
 #include "../includes/mini_maths.h"
-
-bool	solve_quadratic(t_quad q, double *t0, double *t1)
-{
-	double	discriminant;
-	double	q_calc;
-
-	discriminant = q.b * q.b - 4 * q.a * q.c;
-	if (discriminant < 0)
-	{
-		return (false);
-	}
-	discriminant = sqrt(discriminant);
-	if (q.b < 0)
-	{
-		q_calc = -0.5 * (q.b - discriminant);
-	}
-	else
-	{
-		q_calc = -0.5 * (q.b + discriminant);
-	}
-	*t0 = q_calc / q.a;
-	*t1 = q.c / q_calc;
-	if (*t0 > *t1)
-	{
-		ft_swap(t0, t1);
-	}
-	return (true);
-}
 
 bool	valid_cylinder_candidate(t_ray ray, t_cylinder *cylinder,
 			t_vec axis, double t_candidate)

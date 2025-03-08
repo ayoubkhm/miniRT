@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//main.c
+//main charactere is ayoub LOL.c
+// 
 
 #include "../includes/minirt.h"
 #include <math.h>

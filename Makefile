@@ -42,7 +42,7 @@ SRC =	./maths/intersection.c \
 	./main.c \
 	./engine/texture_mapping.c \
 	./mlx_utils.c \
-	./light_effects.c \
+	./engine/light_effects.c \
 	./scene/parse_sphere.c \
 	./scene/add_sphere.c \
 	./scene/parse_hyperboloid.c \
@@ -52,6 +52,7 @@ SRC =	./maths/intersection.c \
 	./scene/parse_cone.c \
 	./scene/add_cone.c \
 	./scene/scene.c \
+	./scene/scene_2.c \
 	./scene/parse_plane.c \
 	./scene/add_plane.c \
 	./scene/parse_scene.c \

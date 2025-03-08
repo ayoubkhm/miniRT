@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/02/14 16:20:23 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 05:32:27 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	handle_texture_error(t_cylinder *cylinder, char *msg, char *str)
 {
-	fprintf(stderr, msg, str);
+	printf(stderr, msg, str);
 	free(cylinder);
 	exit(EXIT_FAILURE);
 }

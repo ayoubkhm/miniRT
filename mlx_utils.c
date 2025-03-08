@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:49:13 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 01:32:01 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:56:32 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,6 @@ void	close_window(t_scene *scene)
 	exit(0);
 }
 
-void	draw_cross(char *image_data, int size, t_color color, int line_len)
-{
-	int	x_center;
-	int	y_center;
-	int	x;
-	int	y;
-
-	x_center = WIDTH / 2;
-	y_center = HEIGHT / 2;
-	x = x_center - size;
-	y = y_center - size;
-	while (x <= x_center + size)
-		put_pixel(image_data, x++, y_center, color, line_len);
-	while (y <= y_center + size)
-		put_pixel(image_data, x_center, y++, color, line_len);
-}
-
 void	render_scene(t_scene *scene)
 {
 	int	x;
@@ -78,8 +61,6 @@ void	render_scene(t_scene *scene)
 		printf("\rRendering: %d%%", (100 * y) / HEIGHT);
 		y++;
 	}
-	draw_cross(scene->image_data, 10,
-		(t_color){128, 128, 128}, scene->line_len);
 	mlx_put_image_to_window(scene->mlx, scene->win, scene->image, 0, 0);
 }
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   rendering.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 04:31:35 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 04:59:17 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 
 void	light_processing(t_scene *scene, t_tools *t)
@@ -49,6 +61,7 @@ void	process_by_pixel(t_scene *scene, int x, int y)
 	t_vec		ray_dir;
 	t_ray		ray;
 	t_color		color;
+	t_image		img;
 
 	calc.ndc_x = ((float)x + 0.5f) / (float)WIDTH;
 	calc.ndc_y = ((float)y + 0.5f) / (float)HEIGHT;
@@ -63,5 +76,7 @@ void	process_by_pixel(t_scene *scene, int x, int y)
 	ray.origin = scene->camera.ray.origin;
 	ray.direction = ray_dir;
 	color = trace_ray(scene, ray, MAX_DEPTH);
-	put_pixel(scene->image_data, x, y, color, scene->line_len);
+	img.data = scene->image_data;
+	img.size_line = scene->line_len;
+	put_pixel(&img, x, y, color);
 }

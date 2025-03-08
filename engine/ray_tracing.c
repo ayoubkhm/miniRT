@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ray_tracing.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 04:30:59 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 05:32:52 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 
 t_color	compute_reflection(t_scene *scene, t_trace *trace, t_ray ray, int depth)
@@ -49,7 +61,7 @@ t_color	trace_ray(t_scene *scene, t_ray ray, int depth)
 	t_trace				trace;
 	t_recursive_params	rec_params;
 
-	memset(&trace.t, 0, sizeof(t_tools));
+	ft_memset(&trace.t, 0, sizeof(t_tools));
 	trace.reflect_color = (t_color){0, 0, 0};
 	trace.refract_color = (t_color){0, 0, 0};
 	if (depth > 0 && trace_scene(scene, ray, &trace.t.hit))

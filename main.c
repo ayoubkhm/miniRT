@@ -6,7 +6,7 @@
 /*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 01:42:01 by akhamass          #+#    #+#             */
-/*   Updated: 2025/03/08 01:54:29 by akhamass         ###   ########.fr       */
+/*   Updated: 2025/03/08 04:57:48 by akhamass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,16 @@ int	trace_scene(t_scene *scene, t_ray ray, t_hit *hit)
 	}
 	return (found);
 }
-void put_pixel(char *data, int x, int y, t_color color, int size_line)
-{
-    int index;
 
-    index = y * size_line + x * 4;
-    data[index] = color.b;
-    data[index + 1] = color.g;
-    data[index + 2] = color.r;
-    data[index + 3] = 0;
+void	put_pixel(t_image *img, int x, int y, t_color color)
+{
+	int	index;
+
+	index = y * img->size_line + x * 4;
+	img->data[index] = color.b;
+	img->data[index + 1] = color.g;
+	img->data[index + 2] = color.r;
+	img->data[index + 3] = 0;
 }
 
 int	main(int ac, char **av)

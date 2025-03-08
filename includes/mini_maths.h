@@ -5,7 +5,7 @@
 # include "../lib/libft/libft.h"
 # include "objects.h"
 # include <math.h>
-#include <float.h>  // Pour DBL_MAX
+# include <float.h>
 
 bool solve_quadratic(double A, double B, double C, double *t0, double *t1);
 bool valid_cylinder_candidate(t_vec ray_origin, t_vec ray_dir, t_cylinder *cylinder, t_vec axis, double t_candidate);
@@ -40,6 +40,5 @@ t_vec vector_cross(t_vec a, t_vec b);
 
 double vector_length(t_vec v);
 void    ft_swap(double *a, double *b);
-
 
 #endif

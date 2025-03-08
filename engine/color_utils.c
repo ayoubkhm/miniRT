@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   color_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 03:47:04 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 04:29:50 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 
 t_color_d	normalize_color(t_color color)
@@ -20,6 +32,7 @@ void	compute_light_factors(t_lighting_params params,
 	if (*extra > 1.0)
 		*extra = 1.0;
 }
+
 t_color_d	apply_lighting_factors(t_color_d base, double local, double extra)
 {
 	t_color_d	result;

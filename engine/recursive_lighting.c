@@ -1,21 +1,33 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   recursive_lighting.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: akhamass <akhamass@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/08 04:31:30 by akhamass          #+#    #+#             */
+/*   Updated: 2025/03/08 04:31:31 by akhamass         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minirt.h"
 
 t_color	compute_recursive_lighting_sum(t_color local_color,
-    t_color reflect_color, t_color refract_color, t_recursive_params params)
+	t_color reflect_color, t_color refract_color, t_recursive_params params)
 {
-double	local_weight;
-t_color	result;
+	double	local_weight;
+	t_color	result;
 
-local_weight = 1.0 - params.reflectivity - params.transparency;
-if (local_weight < 0)
-    local_weight = 0.0;
-result.r = (int)(local_color.r * local_weight + reflect_color.r
-        * params.reflectivity + refract_color.r * params.transparency);
-result.g = (int)(local_color.g * local_weight + reflect_color.g
-        * params.reflectivity + refract_color.g * params.transparency);
-result.b = (int)(local_color.b * local_weight + reflect_color.b
-        * params.reflectivity + refract_color.b * params.transparency);
-return (result);
+	local_weight = 1.0 - params.reflectivity - params.transparency;
+	if (local_weight < 0)
+		local_weight = 0.0;
+	result.r = (int)(local_color.r * local_weight + reflect_color.r
+			* params.reflectivity + refract_color.r * params.transparency);
+	result.g = (int)(local_color.g * local_weight + reflect_color.g
+			* params.reflectivity + refract_color.g * params.transparency);
+	result.b = (int)(local_color.b * local_weight + reflect_color.b
+			* params.reflectivity + refract_color.b * params.transparency);
+	return (result);
 }
 
 t_color	clamp_color(t_color color)
